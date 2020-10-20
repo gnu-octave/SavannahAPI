@@ -196,7 +196,7 @@ foreach ($trackers as $tracker) {
   </p>
   <p>
     Get the source code of this page on
-    <a href="https://github.com/gnu-octave/release-burndown-chart">GitHub</a>.
+    <a href="https://github.com/gnu-octave/release-burn-down-chart">GitHub</a>.
   </p>
 </div>
 
