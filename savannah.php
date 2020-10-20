@@ -96,9 +96,6 @@ function countTableItems($tab) {
 <head>
   <title><?php echo $page_title; ?></title>
   <script>
-  function hideLoading() {
-    document.getElementById('loading').style.display = 'none';
-  }
   function openAll (){
     var details = document.getElementsByTagName ("details");
     var len = details.length;
@@ -145,15 +142,9 @@ function countTableItems($tab) {
   .priori { background-color: #ffadad; }
   </style>
 </head>
-<body onLoad="hideLoading();">
+<body>
 
 <h1><?php echo $page_title; ?></h1>
-
-<div id="loading">Loading data from Savannah, just a few seconds ...</div>
-
-<?php
-ob_flush();  // Show page immediately until here.
-?>
 
 <button type="button" onclick="openAll()">show all details</button>
 <button type="button" onclick="closeAll()">hide all details</button>
@@ -200,7 +191,7 @@ foreach ($trackers as $tracker) {
 <div id="footer">
   <p>
     Savannah cache expires in
-    <b><?php echo $cache_max_age - time() + filemtime($cache_file) ?></b>
+    <b><?php echo max($cache_max_age - time() + filemtime($cache_file), 0); ?></b>
     seconds.
   </p>
   <p>
