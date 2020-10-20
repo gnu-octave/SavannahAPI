@@ -1,5 +1,5 @@
 <?php
-$page_title = "GNU Octave -- Release Burndown Chart";
+$page_title = "GNU Octave -- Release Burn Down Chart";
 $cache_file = 'savannah.cache.json';
 $cache_max_age = 2 * 60;  // seconds
 
