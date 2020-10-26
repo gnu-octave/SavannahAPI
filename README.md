@@ -30,6 +30,7 @@ To add (or remove) particular queries, modify the `$queries` array in
 ```php
 $queries = array(
   array(
+    true,  // count items for tracker sum (Bugs, Patches, ...)
     'Query label',
     'https://savannah.gnu.org/bugs/index.php?...'
   )
