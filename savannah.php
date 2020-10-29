@@ -106,6 +106,59 @@ function extractTableFromURL($url) {
 function countTableItems($tab) {
   return max (substr_count($tab, '<tr') - 1, 0);  // minus table head
 }
+
+# Workaround for https://savannah.nongnu.org/support/?110340
+function patchFromCache($queries) {
+  $cache = array();
+
+  for ($i = 1; $i < count($queries); $i++) {
+    $doc = new DOMDocument;
+    $doc->preserveWhiteSpace = false;
+    $doc->loadHTML(utf8_decode($queries[$i][3]));
+
+    $table = $doc->getElementsByTagName('table')[0];
+
+    $xpath = new DOMXpath($doc);
+    if (! array_key_exists("head", $cache)) {
+      $element = $xpath->query("./tr/th[1]", $table);
+      $cache["head"] = $element[0]->parentNode;
+    }
+    $elements = $xpath->query("./tr/td[1]", $table);
+    foreach ($elements as $element) {
+      $cache[$element->nodeValue] = $element->parentNode;
+    }
+  }
+
+  $doc = new DOMDocument;
+  $doc->preserveWhiteSpace = false;
+  $doc->loadHTML(utf8_decode($queries[0][3]));
+
+  $table = $doc->getElementsByTagName('table')[0];
+
+  $xpath = new DOMXpath($doc);
+
+  for ($i = 1; $i < $table->childNodes->length; $i++) {
+    $tr = $table->childNodes[$i];
+    if ($tr->nodeName == "tr") {
+      $id = $xpath->query("./td[1]/a", $tr);
+      if ($id->length > 0) {
+        $id = $id[0]->nodeValue;
+        if (!is_null($id) and array_key_exists($id, $cache)) {
+          $new_tr = $doc->importNode($cache[$id], true);
+          $table->replaceChild($new_tr, $tr);
+        }
+      }
+      $id = $xpath->query("./th[1]", $tr);
+      if ($id->length > 0) {
+        $new_tr = $doc->importNode($cache["head"], true);
+        $table->replaceChild($new_tr, $tr);
+      }
+    }
+  }
+  $queries[0][3] = $doc->saveHTML($table);
+
+  return $queries;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -180,6 +233,8 @@ if (file_exists($cache_file)
   foreach ($queries as $key => $query) {
     $queries[$key][3] = extractTableFromURL($query[2]);
   }
+  # Workaround for https://savannah.nongnu.org/support/?110340
+  $queries = patchFromCache($queries);
   file_put_contents($cache_file, json_encode($queries), LOCK_EX);
 }
 
