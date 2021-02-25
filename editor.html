@@ -31,10 +31,11 @@
 
 <div>
   <h1>Savannah API query editor</h1>
-  <b>api.php?</b>
+  <b>https://octave.space/savannah/api.php?</b>
   <input type="text" id="request" size="80"
          value="Action=get&amp;Format=HTMLCSS&amp;OpenClosed=open&amp;OrderBy=TrackerID,!ItemID">
-  <button type="button" onclick="apiRequest()">Get data</button>
+  <button type="button" id="requestButton"
+          onclick="apiRequest()">Send API request</button>
 </div>
 
 <div id="result">
