@@ -9,7 +9,7 @@ $queries = [
    'label' => 'Octave 6',
    'api'   => ['TrackerID' => 'bugs',
                'Release' => '6'],
-   'url'   => 'https://savannah.gnu.org/bugs/index.php?go_report=Apply&group=octave&func=browse&set=custom&msort=0&report_id=221&advsrch=1&resolution_id%5B%5D=0&bug_group_id%5B%5D=0&status_id%5B%5D=1&priority%5B%5D=0&severity%5B%5D=0&category_id%5B%5D=100&category_id%5B%5D=110&category_id%5B%5D=101&category_id%5B%5D=102&category_id%5B%5D=104&category_id%5B%5D=105&category_id%5B%5D=106&category_id%5B%5D=107&category_id%5B%5D=103&category_id%5B%5D=114&category_id%5B%5D=112&category_id%5B%5D=109&category_id%5B%5D=113&release_id%5B%5D=170&release_id%5B%5D=172&release_id%5B%5D=173&platform_version_id%5B%5D=0&history_search=0&history_field=0&history_event=modified&history_date_dayfd=6&history_date_monthfd=12&history_date_yearfd=2020&chunksz=100&spamscore=5&boxoptionwanted=1#options'],
+   'url'   => 'https://savannah.gnu.org/bugs/index.php?go_report=Apply&group=octave&func=browse&set=custom&msort=0&report_id=221&advsrch=1&resolution_id%5B%5D=0&bug_group_id%5B%5D=0&status_id%5B%5D=1&priority%5B%5D=0&severity%5B%5D=0&category_id%5B%5D=100&category_id%5B%5D=110&category_id%5B%5D=101&category_id%5B%5D=102&category_id%5B%5D=104&category_id%5B%5D=105&category_id%5B%5D=106&category_id%5B%5D=107&category_id%5B%5D=103&category_id%5B%5D=114&category_id%5B%5D=112&category_id%5B%5D=109&category_id%5B%5D=113&release_id%5B%5D=173&release_id%5B%5D=174&platform_version_id%5B%5D=0&history_search=0&history_field=0&history_event=modified&history_date_dayfd=25&history_date_monthfd=2&history_date_yearfd=2021&chunksz=100&spamscore=5&boxoptionwanted=1#options'],
   ['sum'   => true,
    'label' => 'Severity >= 4',
    'api'   => ['TrackerID' => 'bugs',
