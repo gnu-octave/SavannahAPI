@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Savannah browser</title>
+  <style>
+  body { }
+  a { color: navy; }
+  div {
+    margin: 20px;
+  }
+  div#footer {
+    text-align: center;
+  }
+  </style>
+  <script>
+  function apiRequest() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("result").innerHTML =
+        this.responseText;
+      }
+    };
+    var request = document.getElementById("request").value;
+    xhttp.open("GET", "api.php?" + request, true);
+    xhttp.send();
+  }
+  </script>
+</head>
+<body>
+
+<div>
+  <h1>Savannah API query editor</h1>
+  <b>api.php?</b>
+  <input type="text" id="request" size="80"
+         value="Action=get&amp;Format=HTMLCSS&amp;OpenClosed=open&amp;OrderBy=TrackerID,!ItemID">
+  <button type="button" onclick="apiRequest()">Get data</button>
+</div>
+
+<div id="result">
+</div>
+
+<div id="footer">
+  <p>
+    Get the source code of this page on
+    <a href="https://github.com/gnu-octave/release-burn-down-chart">GitHub</a>.
+  </p>
+</div>
+
+</body>
+</html>
