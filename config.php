@@ -13,7 +13,7 @@ class CONFIG
   const DELAY       = ['crawlItem'         =>      5,   // Seconds delay
                        'crawlNewItems'     => 1 * 60,   // Seconds delay
                        'crawlUpdatedItems' => 1 * 60];  // Seconds delay
-  const MAX_CRAWL_ITEMS = 5;  // Maximal number of items updates per request.
+  const MAX_CRAWL_ITEMS = 50; // Maximal number of items updates per request.
                               // Automatic item updates are not affected
                               // by this setting.
 
