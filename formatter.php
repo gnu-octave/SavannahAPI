@@ -32,6 +32,13 @@ class formatter
    */
   private function idsToString($item)
   {
+    $toDays = function ($t) {
+      $t = intval((time() - $t) / 60 / 60 / 24);
+      if ($t > 365) {
+        return '> ' . intval($t / 365) . ' year(s) ago';
+      }
+      return ($t === 0) ? '< a day' : "$t day(s) ago";
+    };
     if (array_key_exists('TrackerID', $item)) {
       $item['TrackerID']   = CONFIG::TRACKER[$item['TrackerID']];
     }
@@ -39,10 +46,10 @@ class formatter
       $item['OpenClosed']  = CONFIG::ITEM_STATE[$item['OpenClosed']];
     }
     if (array_key_exists('SubmittedOn', $item)) {
-      $item['SubmittedOn'] = date(DATE_RFC2822, $item['SubmittedOn']);
+      $item['SubmittedOn'] = $toDays($item['SubmittedOn']);
     }
     if (array_key_exists('LastComment', $item)) {
-      $item['LastComment'] = date(DATE_RFC2822, $item['LastComment']);
+      $item['LastComment'] = $toDays($item['LastComment']);
     }
     return $item;
   }
