@@ -1,49 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Savannah browser</title>
-  <style>
-  body { }
-  a { color: navy; }
-  div {
-    margin: 20px;
-  }
-  div#footer {
-    text-align: center;
-  }
-  </style>
-  <script>
-  function fillRequestField() {
-    var value = "Action=get&amp;Format=HTMLCSS&amp;OpenClosed=open"
-              + "&amp;OrderBy=TrackerID,!ItemID";
-    if (document.location.search.substring(1)) {
-      value = document.location.search.substring(1);
-    }
-    request = document.getElementById("request").value = value;
-  }
-
-  function apiRequest() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("result").innerHTML =
-        this.responseText;
-      }
-    };
-    var request = document.getElementById("request").value;
-    xhttp.open("GET", "api.php?" + request, true);
-    xhttp.send();
-  }
-  </script>
+  <title>Savannah API request editor</title>
+  <script src="src/scripts.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="src/style.css">
 </head>
-<body onload="fillRequestField()">
+<body onload="apiRequestFill()">
 
 <div>
-  <h1>Savannah API query editor</h1>
+  <h1>Savannah API request editor</h1>
   <b>https://octave.space/savannah/api.php?</b>
   <input type="text" id="request" size="80">
   <button type="button" id="requestButton"
-          onclick="apiRequest()">Send API request</button>
+          onclick="apiRequestSend()">Send API request</button>
+  <img id="loading" src="assets/loading.gif">
+  <h2>0 matches</h2>
 </div>
 
 <div id="result">

@@ -117,8 +117,8 @@ class formatter
   private function addURLs($item)
   {
     $id  = $item['ItemID'];
-    $refreshLink = '<a onclick="apiUpdate(\'%s\', \'%s\')" href="#">🔄</a>';
-    $refreshLink = sprintf($refreshLink, $item['TrackerID'], $id);
+    $refreshLink = "<a onclick=\"apiUpdateItem(this, '"
+                   . $item['TrackerID'] . "', '$id')\" href=\"#\">🔄</a>";
     $url = CONFIG::BASE_URL . '/' . $item['TrackerID'] . "/index.php?$id";
     $item['ItemID'] = "<a href=\"$url\">$id</a>";
     $item['Title']  = "<a href=\"$url\">" . $item['Title'] . "</a>";

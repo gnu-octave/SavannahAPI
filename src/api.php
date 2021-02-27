@@ -44,31 +44,41 @@ class api
     $this->apiActions = $apiActions;
   }
 
+
+  /**
+   * Create a well-formed JSON return string.
+   */
+  private function JSON($state, $message) {
+    return json_encode(["state" => $state, "message" => $message]);
+  }
+
+
   /**
    * Process an API request.
    *
    * @param requestUnfiltered an array like created from `$_GET`.
    *
    * @returns a string containing the result of the web request.
+   *          Error messages are JSON encoded with the fields:
+   *          "state"  : one of "success", "error", "warning", "info"
+   *          "message": string with information
    */
   public function processRequest($requestUnfiltered)
   {
     $request = $this->validateRequest($requestUnfiltered);
     if (is_string($request)) {
-      die ("API error: $request");
+      die ($this->JSON("error", $request));
     }
 
     switch ($request['Action']) {
       case 'update':
-        $success = $this->actionUpdate($request);
-        return ($success === true) ? "Update complete."
-                                   : die ("API error: $success");
+        return $this->actionUpdate($request);
         break;
       case 'get':
         return $this->actionGet($request);
         break;
       default:
-        die("API error: 'action' value must be one of {update|get}.");
+        die($this->JSON("error", "'action' value must be one of {update|get}."));
     }
   }
 
@@ -191,7 +201,8 @@ class api
         return $fmt->asCSV();
         break;
       default:
-        die("Invalid format, use 'HTML', 'HTMLCSS', 'JSON', 'CSV'");
+        die(JSON("error",
+                 "Invalid format, use 'HTML', 'HTMLCSS', 'JSON', 'CSV'"));
         break;
     }
   }
@@ -203,7 +214,7 @@ class api
    *
    * @param request a validated array like created from `$_GET`.
    *
-   * @returns `true` if the update succeeded, an error string otherwise.
+   * @returns JSON encoded string as described in `processRequest`.
    */
   private function actionUpdate($request)
   {
@@ -220,7 +231,7 @@ class api
       $ids = $requestIDs;
       $trackerID = array_search($tracker, CONFIG::TRACKER);
       if ($trackerID === false) {
-        return "Invalid TrackerID '$tracker'.  Stopping.";
+        return $this->JSON("error", "Invalid TrackerID '$tracker'.  Stopping.");
       }
 
       $db = DB::getInstance();
@@ -236,7 +247,8 @@ class api
           $lastID = $db->getMaxItemIDFromTracker($trackerID);
           $ids = array_merge($ids, $crawler->crawlNewItems($tracker, $lastID));
         } else {
-          return "'crawlNewItems_$tracker' delayed for $nextLookup seconds.";
+          return $this->JSON("info",
+            "'crawlNewItems_$tracker' delayed for $nextLookup seconds.");
         }
 
         // Look for update items, only if not much new is to be added.
@@ -249,8 +261,8 @@ class api
             $ids = array_merge($ids, $crawler->crawlUpdatedItems($tracker,
                                                                 $lastComment));
           } else {
-            return "'crawlUpdatedItems_$tracker'
-                  delayed for $nextLookup seconds.";
+            return $this->JSON("info", "'crawlUpdatedItems_$tracker'
+                                       delayed for $nextLookup seconds.");
           }
         } else {
           DEBUG_LOG("'crawlUpdatedItems_$tracker' skipped.");
@@ -261,11 +273,12 @@ class api
         if ($nextLookup <= 0) {
           $db->setTimer("crawlItem", time());
         } else {
-          return "'crawlItem' delayed for $nextLookup seconds.";
+          return $this->JSON("info",
+                             "'crawlItem' delayed for $nextLookup seconds.");
         }
         if (count($ids) > CONFIG::MAX_CRAWL_ITEMS) {
-          return "'crawlItem' not more than "
-                . CONFIG::MAX_CRAWL_ITEMS . " item updates permitted.";
+          return $this->JSON("error", "'crawlItem' not more than "
+            . CONFIG::MAX_CRAWL_ITEMS . " item updates permitted.");
         }
       }
 
@@ -273,7 +286,7 @@ class api
       sort($ids);  // oldest first
       foreach ($ids as $id) {
         if ($id === 0) {
-          return "Invalid ItemID found.  Stopping.";
+          return $this->JSON("error", "Invalid ItemID found.  Stopping.");
         }
         DEBUG_LOG("--> Update item ID '$id' from '$tracker'.");
         list($item, $discussion) = $crawler->crawlItem($tracker, $id);
@@ -283,8 +296,8 @@ class api
       }
     }
 
-    // Success.
-    return true;
+    return $this->JSON("success",
+      "Update successful.  Please reload this table or website.");
   }
 }
 

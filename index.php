@@ -79,52 +79,8 @@ $queries = [
 <html lang="en">
 <head>
   <title><?php echo $page_title; ?></title>
-  <script>
-  function openAll (){
-    var details = document.getElementsByTagName ("details");
-    var len = details.length;
-    for (var i = 0; i < len; i++) {
-      details[i].setAttribute ("open", "true");
-    }
-  }
-
-  function closeAll (){
-    var details = document.getElementsByTagName ("details");
-    var len = details.length;
-    for (var i = 0; i < len; i++) {
-      details[i].removeAttribute ("open");
-    }
-  }
-  </script>
-  <style>
-  body { padding: 5px; }
-  a { color: navy; }
-  details {
-    margin: 10px;
-    border: 1px solid black;
-  }
-  summary {
-    background-color: beige;
-    padding: 5px;
-  }
-  div#footer {
-    text-align: center;
-    margin: 20px;
-  }
-  table { border-collapse: collapse; }
-  tr:not([class]) { background-color: powderblue; }
-  td, th { padding: 5px; }
-  /* From https://savannah.gnu.org/css/internal/base.css */
-  .priora { background-color: #fff2f2; }
-  .priorb { background-color: #ffe8e8; }
-  .priorc { background-color: #ffe0e0; }
-  .priord { background-color: #ffd8d8; }
-  .priore { background-color: #ffcece; }
-  .priorf { background-color: #ffc6c6; }
-  .priorg { background-color: #ffbfbf; }
-  .priorh { background-color: #ffb7b7; }
-  .priori { background-color: #ffadad; }
-  </style>
+  <script src="src/scripts.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="src/style.css">
 </head>
 <body>
 

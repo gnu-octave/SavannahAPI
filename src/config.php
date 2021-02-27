@@ -10,7 +10,7 @@ class CONFIG
                        'id'   => 'octave'];
   const CHUNK_SIZE  = 150;  // Items read from the overview page at once.
                             // (150 is Savannah maximum).
-  const DELAY       = ['crawlItem'         =>      5,   // Seconds delay
+  const DELAY       = ['crawlItem'         =>      1,   // Seconds delay
                        'crawlNewItems'     => 1 * 60,   // Seconds delay
                        'crawlUpdatedItems' => 1 * 60];  // Seconds delay
   const MAX_CRAWL_ITEMS = 50; // Maximal number of items updates per request.
