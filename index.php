@@ -1,4 +1,7 @@
 <?php
+
+require_once($_SERVER["DOCUMENT_ROOT"] . "/src/api.php");
+
 $page_title = "GNU Octave -- Release Burn Down Chart";
 
 /*
@@ -137,12 +140,9 @@ $commonAPIParams = [
   'Format'     => 'HTMLCSS',
   'OpenClosed' => 'open',
   'Category!'  => 'Forge,website',
-  'Columns'    => 'TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,Release,OperatingSystem,OpenClosed'];
+  'Columns'    => 'ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,Release,OperatingSystem'];
 
-define('USE_API_INCLUDED', true);
-require_once("api.php");
 $api = new api();
-
 foreach ([['Bug', '/bugs/'], ['Patch', '/patch/']] as $tracker) {
   $sum = 0;
   $output = '';
@@ -154,11 +154,16 @@ foreach ([['Bug', '/bugs/'], ['Patch', '/patch/']] as $tracker) {
         unset($apiRequest['Category!']);
       }
       $resultTable = $api->processRequest($apiRequest);
-      $count = max (substr_count($resultTable, '<tr') - 1, 0);
+      foreach ($apiRequest as $key => $value) {
+        $apiRequest[$key] = "$key=$value";
+      }
+      $apiRequest = implode('&', $apiRequest);
+      $count = max(substr_count($resultTable, '<tr') - 1, 0);
       $output .= '<details>';
       $output .= '<summary>';
-      $output .= '  <b>(' . $count . ')</b> ' . $query['label'] . ' &nbsp; ';
-      $output .= '  <a href="' . $query['url'] . '">[link]</a>';
+      $output .= "  <b>($count)</b> " . $query['label'] . ' &nbsp; ';
+      $output .= '  <a href="' . $query['url'] . '">[Savannah]</a> &nbsp; ';
+      $output .= "  <a href=\"editor.html?$apiRequest\">[API editor]</a>";
       $output .= '</summary>';
       $output .= $resultTable;
       $output .= '</details>';
@@ -167,7 +172,7 @@ foreach ([['Bug', '/bugs/'], ['Patch', '/patch/']] as $tracker) {
       }
     }
   }
-  echo '<h2>' . $tracker[0] . ' Tracker (' . $sum . ')</h2>';
+  echo '<h2>' . $tracker[0] . " Tracker ($sum)</h2>";
   echo $output;
 }
 ?>

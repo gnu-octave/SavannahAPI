@@ -5,6 +5,7 @@ require_once("config.php");
 class formatter
 {
   private $items;
+  private $columns;
 
   /* From https://savannah.gnu.org/css/internal/base.css */
   private $CSS_COLORS = [
@@ -16,21 +17,63 @@ class formatter
 
   /**
    * Constructor.
+   *
+   * @param items array of associative array with fields given in the
+   *              "database column" of `CONST::ITEM_DATA`.
+   *
+   * @param columns array of columns to display.
    */
-  public function  __construct($items)
+  public function  __construct($items, $columns)
   {
-    $this->items = $items;
+    $this->items   = $items;
+    $this->columns = $columns;
   }
 
   /**
-   * Translate IDs and TIMESTAMPS to human readable strings.
+   * Reduce columns of a given data row.
+   *
+   * Should be called last before the output.
    *
    * @param item associative array with fields given in the "database column"
    *             of `CONST::ITEM_DATA`.
    *
-   * @returns item with all IDs and TIMESTAMPS as human readable strings.
+   * @returns item with only queried columns.
+   */
+  private function reduceColumns($item)
+  {
+    $new_item = array();
+    foreach (array_merge(['refresh'], $this->columns) as $key) {
+      if (array_key_exists($key, $item)) {
+        $new_item[$key] = $item[$key];
+      }
+    }
+    return $new_item;
+  }
+
+  /**
+   * Translate IDs to human readable strings.
+   *
+   * @param item associative array with fields given in the "database column"
+   *             of `CONST::ITEM_DATA`.
+   *
+   * @returns item with all IDs as human readable strings.
    */
   private function idsToString($item)
+  {
+    $item['TrackerID']  = CONFIG::TRACKER[$item['TrackerID']];
+    $item['OpenClosed'] = CONFIG::ITEM_STATE[$item['OpenClosed']];
+    return $item;
+  }
+
+  /**
+   * Translate TIMESTAMPS to human readable strings.
+   *
+   * @param item associative array with fields given in the "database column"
+   *             of `CONST::ITEM_DATA`.
+   *
+   * @returns item with all TIMESTAMPS as human readable strings.
+   */
+  private function timestampToString($item)
   {
     $toDays = function ($t) {
       $t = intval((time() - $t) / 60 / 60 / 24);
@@ -39,18 +82,8 @@ class formatter
       }
       return ($t === 0) ? '< a day' : "$t day(s) ago";
     };
-    if (array_key_exists('TrackerID', $item)) {
-      $item['TrackerID']   = CONFIG::TRACKER[$item['TrackerID']];
-    }
-    if (array_key_exists('OpenClosed', $item)) {
-      $item['OpenClosed']  = CONFIG::ITEM_STATE[$item['OpenClosed']];
-    }
-    if (array_key_exists('SubmittedOn', $item)) {
-      $item['SubmittedOn'] = $toDays($item['SubmittedOn']);
-    }
-    if (array_key_exists('LastComment', $item)) {
-      $item['LastComment'] = $toDays($item['LastComment']);
-    }
+    $item['SubmittedOn'] = $toDays($item['SubmittedOn']);
+    $item['LastComment'] = $toDays($item['LastComment']);
     return $item;
   }
 
@@ -64,10 +97,6 @@ class formatter
    */
   private function addCSS($item)
   {
-    if (!array_key_exists('OpenClosed', $item)
-        || !array_key_exists('Priority', $item)) {
-      return "";
-    }
     // Translate something like "5 - Normal" to "e", etc.
     $color = $this->CSS_COLORS[$item['OpenClosed']]
                               [((int) $item['Priority'][0]) - 1];
@@ -87,16 +116,13 @@ class formatter
    */
   private function addURLs($item)
   {
-    if (array_key_exists('TrackerID', $item)
-        && array_key_exists('ItemID', $item)) {
-      $id  = $item['ItemID'];
-      $url = CONFIG::BASE_URL . '/' . $item['TrackerID'] . "/index.php?$id";
-
-      $item['ItemID'] = "<a href=\"$url\">$id</a>";
-      if (array_key_exists('Title', $item)) {
-        $item['Title']  = "<a href=\"$url\">" . $item['Title'] . "</a>";
-      }
-    }
+    $id  = $item['ItemID'];
+    $refreshLink = '<a onclick="apiUpdate(\'%s\', \'%s\')" href="#">🔄</a>';
+    $refreshLink = sprintf($refreshLink, $item['TrackerID'], $id);
+    $url = CONFIG::BASE_URL . '/' . $item['TrackerID'] . "/index.php?$id";
+    $item['ItemID'] = "<a href=\"$url\">$id</a>";
+    $item['Title']  = "<a href=\"$url\">" . $item['Title'] . "</a>";
+    $item = array_merge(['refresh' => $refreshLink], $item);
     return $item;
   }
 
@@ -114,13 +140,16 @@ class formatter
   {
     $css = ($color) ? ' style="background-color: powderblue; padding: 5px;"'
                     : '';
-    $str = "<tr><th$css>" . implode("</th><th$css>", $columns) . '</th></tr>';
+    $str = '<tr>' . (($color) ? "<th$css>&nbsp;</th>" : '')
+           . "<th$css>" . implode("</th><th$css>", $columns) . '</th></tr>';
     foreach ($this->items as $item) {
       $item = $this->idsToString($item);
+      $item = $this->timestampToString($item);
       $css = ($color) ? $this->addCSS($item) : '';
       if ($color) {
         $item = $this->addURLs($item);
       }
+      $item = $this->reduceColumns($item);
       $item_str = '';
       foreach ($item as $col) {
         $item_str .= "<td$css>$col</td>";
@@ -141,9 +170,9 @@ class formatter
    */
   public function asJSON()
   {
-    $items = $this->items;
-    foreach ($items as $idx=>$item) {
-      $items[$idx] = $this->idsToString($item);
+    $items = $this->items;  // work on a copy
+    foreach ($items as &$item) {
+      $item = $this->reduceColumns($this->idsToString($item));
     }
     return json_encode($items);
   }
@@ -158,9 +187,10 @@ class formatter
    */
   public function asCSV()
   {
-    $str = '';
+    $str = '"' . implode('","', $this->columns) . '"' . "\n";
     foreach ($this->items as $item) {
-      $str .= '"' . implode('","', $this->idsToString($item)) . '"' . "\n";
+      $item = $this->reduceColumns($this->idsToString($item));
+      $str .= '"' . implode('","', $item) . '"' . "\n";
     }
     return $str;
   }

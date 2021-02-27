@@ -13,6 +13,15 @@
   }
   </style>
   <script>
+  function fillRequestField() {
+    var value = "Action=get&amp;Format=HTMLCSS&amp;OpenClosed=open"
+              + "&amp;OrderBy=TrackerID,!ItemID";
+    if (document.location.search.substring(1)) {
+      value = document.location.search.substring(1);
+    }
+    request = document.getElementById("request").value = value;
+  }
+
   function apiRequest() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -27,13 +36,12 @@
   }
   </script>
 </head>
-<body>
+<body onload="fillRequestField()">
 
 <div>
   <h1>Savannah API query editor</h1>
   <b>https://octave.space/savannah/api.php?</b>
-  <input type="text" id="request" size="80"
-         value="Action=get&amp;Format=HTMLCSS&amp;OpenClosed=open&amp;OrderBy=TrackerID,!ItemID">
+  <input type="text" id="request" size="80">
   <button type="button" id="requestButton"
           onclick="apiRequest()">Send API request</button>
 </div>

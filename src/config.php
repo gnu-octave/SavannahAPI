@@ -81,10 +81,10 @@ class CONFIG
 
 function DEBUG_LOG($str)
 {
-  /* Uncomment for debugging. */
+  /* Uncomment for debugging.
   echo("$str<br>");
   ob_flush();
-  flush();
+  flush();*/
 }
 
 ?>

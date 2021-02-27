@@ -113,9 +113,6 @@ class db
           $conj = 'AND';
         }
         switch ($key) {
-          case 'Columns':
-            $sqlSELECT = $value;
-            break;
           case 'TrackerID':
             $op = (is_null($op) ? $eq : $op);
             $makeValid = (!is_null($makeValid) ? $makeValid
