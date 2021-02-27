@@ -2,6 +2,21 @@
  * Common used functions
  */
 
+function countResults(nodeToCount, nodeResult) {
+  if (nodeToCount.firstChild.tagName == "TABLE") {
+    // ignore head line
+    nodeResult.innerHTML = nodeToCount.getElementsByTagName('tr').length - 1;
+  } else {
+    try {
+      nodeResult.innerHTML = JSON.parse(nodeToCount.innerHTML).length;
+    } catch (e) {
+      // Must be CSV and count rows.  Ignore head line and last newline.
+      nodeResult.innerHTML = nodeToCount.innerHTML.split("\n").length - 2;
+    }
+  }
+}
+
+
 function createPopup(type, message) {
   switch(type) {
   case "warning":
@@ -43,7 +58,10 @@ function createPopup(type, message) {
 
 function apiUpdateItem(node, tracker, id) {
   var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() { apiRequestResultHandle(this); };
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == XMLHttpRequest.DONE) {
+      apiRequestResultHandle(this);
+    }};
   xhttp.open("GET", "api.php?Action=update&TrackerID=" + tracker
                     + "&ItemID=" + id, true);
   xhttp.send();
@@ -121,7 +139,10 @@ function apiRequestSend() {
     if (this.readyState == XMLHttpRequest.DONE) {
       document.getElementById("loading").style.visibility = "hidden";
       document.getElementById("requestButton").disabled = false;
-      apiRequestResultHandle(this, document.getElementById("result"));
+      var results = document.getElementById("result");
+      var matches = document.getElementById("resultCount");
+      apiRequestResultHandle(this, results);
+      countResults(results, matches);
     }};
   var request = document.getElementById("request").value;
   xhttp.open("GET", "api.php?" + request, true);

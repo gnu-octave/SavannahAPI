@@ -11,7 +11,7 @@ class api
    * Valid keys and data types for API action requests.
    */
   private $apiActions = null;
-  private $formats = ['HTML', 'HTMLCSS', 'JSON', 'CSV'];
+  private $formats = ['HTML', 'HTMLCSS', 'JSON', 'CSV', 'LINK'];
 
   /**
    * Constructor.
@@ -44,12 +44,61 @@ class api
     $this->apiActions = $apiActions;
   }
 
+  /**
+   * Process a short API request.
+   *
+   * @param requestStringUnfiltered a string like `12345` or `bug12345`.
+   *
+   * @returns a string containing the result of the web request.
+   *          Error messages are JSON encoded with the fields:
+   *          "state"  : one of "success", "error", "warning", "info"
+   *          "message": string with information
+   */
+  public function processShortRequest($requestStringUnfiltered)
+  {
+    if (count($requestStringUnfiltered) !== 1) {
+      return $this->JSON("error", "Invalid request.  Try 'bug12345'.");
+    }
+    $req = array_key_first($requestStringUnfiltered);
+    // Wild guessing.
+    if (substr($req, 0, 4) === 'bugs') {
+      $request["TrackerID"] = "bugs";
+      $req = substr($req, 4);
+    } elseif (substr($req, 0, 3) === 'bug') {
+      $request["TrackerID"] = "bugs";
+      $req = substr($req, 3);
+    } elseif (substr($req, 0, 5) === 'patch') {
+      $request["TrackerID"] = "patch";
+      $req = substr($req, 5);
+    }
+    $request["ItemID"] = intval($req);
+    if ($request["ItemID"] === 0) {
+      return $this->JSON("error", "Invalid request.  Try 'bug12345'.");
+    }
+    $request["Action"] = "get";
+    $request["Format"] = "LINK";
+    return $this->processRequest($request);
+  }
+
 
   /**
-   * Create a well-formed JSON return string.
+   * Process an API request.
+   *
+   * @param requestStringUnfiltered a string like `Action=get&ItemID=5`.
+   *
+   * @returns a string containing the result of the web request.
+   *          Error messages are JSON encoded with the fields:
+   *          "state"  : one of "success", "error", "warning", "info"
+   *          "message": string with information
    */
-  private function JSON($state, $message) {
-    return json_encode(["state" => $state, "message" => $message]);
+  public function processRequestString($requestStringUnfiltered)
+  {
+    $requestUnfiltered = array();
+    foreach (explode('&', $requestStringUnfiltered) as $param) {
+      list($key, $value) = explode('=', $param);
+      $requestUnfiltered[$key] = $value;
+    }
+    return $this->processRequest($requestUnfiltered);
   }
 
 
@@ -200,6 +249,9 @@ class api
       case 'CSV':
         return $fmt->asCSV();
         break;
+      case 'LINK':
+        return $fmt->asLINK();
+        break;
       default:
         die(JSON("error",
                  "Invalid format, use 'HTML', 'HTMLCSS', 'JSON', 'CSV'"));
@@ -298,6 +350,14 @@ class api
 
     return $this->JSON("success",
       "Update successful.  Please reload this table or website.");
+  }
+
+
+  /**
+   * Create a well-formed JSON return string.
+   */
+  private function JSON($state, $message) {
+    return json_encode(["state" => $state, "message" => $message]);
   }
 }
 
