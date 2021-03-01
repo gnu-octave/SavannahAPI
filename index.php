@@ -1,12 +1,13 @@
 <?php
 
-require_once(dirname(__FILE__) . "/src/api.php");
+require_once(dirname(__FILE__) . "/server/api.php");
 $api = new api();
 
+/*
 if (count($_GET) > 0) {
   echo $api->processShortRequest($_GET);
   return;
-}
+}*/
 
 /*
  * Convenience queries for Savannah Bugs.
@@ -66,17 +67,14 @@ $queries = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>GNU Octave -- Release Burn Down Chart</title>
-  <script src="src/scripts.js" type="text/javascript"></script>
-  <link rel="stylesheet" type="text/css" href="src/style.css">
+  <title>GNU Octave - Savannah Bugs and Patches</title>
+  <script type="text/javascript" src="client/config.js"></script>
+  <script type="text/javascript" src="client/scripts.js"></script>
+  <link rel="stylesheet" type="text/css" href="client/style.css">
 </head>
-<body>
+<body onload="init()">
 
-<h1>GNU Octave -- Release Burn Down Chart</h1>
-
-<button type="button" onclick="openAll()">show all details</button>
-<button type="button" onclick="closeAll()">hide all details</button>
-&nbsp;&nbsp;<a href="editor.html">API Editor</a>
+<h1>GNU Octave - Savannah Bugs and Patches</h1>
 
 <?php
 function createItem($api, $query) {
@@ -88,11 +86,11 @@ function createItem($api, $query) {
   $apiRequest  = $commonAPIParams . '&' . $query['api'];
   $resultTable = $api->processRequestString($apiRequest);
   $count = max(substr_count($resultTable, '<tr') - 1, 0);
-  $output = "<b>($count)</b> " . $query['label']
-    . " &nbsp; <a href=\"" . $query['url'] .   "\">[Savannah]</a>"
-    . " &nbsp; <a href=\"editor.html?$apiRequest\">[API editor]</a>";
-  $output = "<summary>$output</summary>";
-  $output = "<details>$output $resultTable</details>";
+  $output = "<a onclick=\"queryInputInitialize('$apiRequest')\" "
+    .          "href=\"#\">[show]</a> &nbsp;"
+    . "<a href=\"" . $query['url'] . "\">[Savannah]</a> &nbsp;"
+    . "<b>($count)</b> " . $query['label'];
+  $output = "<div class=\"queryStored\">$output</div>";
 
   return [$count, $output];
 }
@@ -109,9 +107,30 @@ foreach ([['Bug', '/bugs/'], ['Patch', '/patch/']] as $tracker) {
       }
     }
   }
-  echo '<h2>' . $tracker[0] . " Tracker ($sum)</h2>$output";
+  echo "$output";
 }
 ?>
+
+<h2>Show and Edit (<span id="resultCount">0</span> items found)</h2>
+
+<div>
+  <input type="text" id="queryLabel"    class="queryEdit boxsizingBorder"
+         placeholder="New query label">
+  <input type="text" id="querySavannah" class="queryEdit boxsizingBorder"
+         placeholder="(optinal) URL to equivalent Savannah query">
+  <textarea id="queryInput" class="queryEdit boxsizingBorder"
+            placeholder="Query parameter"></textarea>
+  <button type="button" id="queryUpdateButton" class="queryEdit"
+          onclick="queryInputSend()">Update</button>
+  <button type="button" id="querySaveButton"
+          class="queryEdit">Save query</button>
+  <button type="button" id="queryCopyLinkButton"
+          class="queryEdit">Copy permalink</button>
+  <img id="loading" src="client/loading.gif">
+</div>
+
+<div id="result">
+</div>
 
 <div id="footer">
   <p>

@@ -1,20 +1,39 @@
 body { padding: 5px; }
 a { color: navy; }
-details {
-  margin: 10px;
+div { margin: 20px; }
+div.queryStored {
+  padding: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: beige;
   border: 1px solid black;
 }
-summary {
-  background-color: beige;
-  padding: 5px;
-}
-div { margin: 20px; }
 div#footer { text-align: center; }
 
 img#loading {
   width: 25px;
   margin-left: 10px;
   visibility: hidden;
+}
+
+.queryEdit {
+  padding: 10px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  background-color: beige;
+}
+input#queryLabel,
+input#querySavannah{
+  width: 100%;
+}
+textarea#queryInput {
+  width: 100%;
+  height: auto;
+  font-size: 120%;
+  overflow: hidden;
+}
+button {
+  width: 150px;
 }
 
 /* The alert message box */
@@ -43,4 +62,10 @@ img#loading {
 /* When moving the mouse over the close button */
 .closebtn:hover {
   color: black;
+}
+
+.boxsizingBorder {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 }

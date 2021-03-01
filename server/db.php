@@ -19,10 +19,11 @@ class db
     if ($this->pdo == null) {
       // Open database.
       try {
-        $this->pdo = new PDO('sqlite:' . CONFIG::DB_FILE);
+        $this->pdo = new PDO('sqlite:' . dirname(__FILE__) . '/'
+                                       . CONFIG::DB_FILE);
       } catch (PDOException $e) {
-        exit("Cannot open database file (write protected?). "
-             . "Exception:\n\t". $e->getMessage());
+        die("Cannot open database file (write protected?). "
+            . "Exception:\n\t". $e->getMessage());
       }
 
       // Check table structure.

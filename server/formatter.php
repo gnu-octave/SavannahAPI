@@ -242,6 +242,7 @@ class formatter
         <meta name="twitter:description" content="' . $item['Title'] . '">
         <meta name="twitter:url"   content="' . $url . '">
         <meta name="twitter:image" content="' . $logo . '">
+        <meta http-equiv="refresh" content="0; url=' . $url . '">
       </head>
       <body>
         <a href="' . $url . '">' . $url . '</a>
