@@ -26,7 +26,7 @@ input#queryLabel,
 input#querySavannah{
   width: 100%;
 }
-textarea#queryInput {
+textarea#queryParameter {
   width: 100%;
   height: auto;
   font-size: 120%;

@@ -111,17 +111,17 @@ foreach ([['Bug', '/bugs/'], ['Patch', '/patch/']] as $tracker) {
 }
 ?>
 
-<h2>Show and Edit (<span id="resultCount">0</span> items found)</h2>
+<h2>Show and Edit (<span id="queryResultCount">0</span> items found)</h2>
 
 <div>
   <input type="text" id="queryLabel"    class="queryEdit boxsizingBorder"
          placeholder="New query label">
   <input type="text" id="querySavannah" class="queryEdit boxsizingBorder"
          placeholder="(optinal) URL to equivalent Savannah query">
-  <textarea id="queryInput" class="queryEdit boxsizingBorder"
+  <textarea id="queryParameter" class="queryEdit boxsizingBorder"
             placeholder="Query parameter"></textarea>
-  <button type="button" id="queryUpdateButton" class="queryEdit"
-          onclick="queryInputSend()">Update</button>
+  <button type="button" id="queryUpdateButton"
+          class="queryEdit">Update</button>
   <button type="button" id="querySaveButton"
           class="queryEdit">Save query</button>
   <button type="button" id="queryCopyLinkButton"
@@ -129,7 +129,7 @@ foreach ([['Bug', '/bugs/'], ['Patch', '/patch/']] as $tracker) {
   <img id="loading" src="client/loading.gif">
 </div>
 
-<div id="result">
+<div id="queryResult">
 </div>
 
 <div id="footer">
