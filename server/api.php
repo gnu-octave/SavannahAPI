@@ -171,7 +171,7 @@ class api
         return "Unknown parameter key '$key'
                 for 'Action=" . $request['Action'] . ".'
                 Valid parameter keys are:
-                {" . implode('=,', array_keys($validParameters)) . "=}.";
+                {" . implode('=, ', array_keys($validParameters)) . "=}.";
       }
       if ((substr($key, -1) === '!')
           && (array_key_exists(substr($key, 0, -1), $request))) {

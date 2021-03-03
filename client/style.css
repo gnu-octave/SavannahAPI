@@ -1,71 +1,24 @@
-body { padding: 5px; }
-a { color: navy; }
-div { margin: 20px; }
-div.queryStored {
-  padding: 5px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+details {
   background-color: beige;
   border: 1px solid black;
 }
-div#footer { text-align: center; }
 
-img#loading {
+div#footer { width: 400px; }
+
+img.loading {
   width: 25px;
   margin-left: 10px;
   visibility: hidden;
 }
 
-.queryEdit {
-  padding: 10px;
-  margin-bottom: 5px;
-  font-weight: bold;
-  background-color: beige;
+table {
+  overflow-x: scroll;
 }
-input#queryLabel,
-input#querySavannah{
-  width: 100%;
-}
-textarea#queryParameter {
-  width: 100%;
-  height: auto;
-  font-size: 120%;
-  overflow: hidden;
-}
-button {
-  width: 150px;
+table td {
+  white-space: nowrap;
 }
 
-/* The alert message box */
-.alert {
-  font-weight: bold;
-  padding: 15px;
-  opacity: 1;
-  transition: opacity 0.6s; /* 600ms to fade out */
-}
-.alert.error   {background-color: #ffb0b0;}
-.alert.success {background-color: #C3FDB8;}
-.alert.info    {background-color: #82CAFA;}
-.alert.warning {background-color: #fff7a7;}
-
-/* The close button */
-.closebtn {
-  margin-right: 15px;
-  font-weight: bold;
-  float: left;
-  font-size: 22px;
-  line-height: 20px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-/* When moving the mouse over the close button */
-.closebtn:hover {
-  color: black;
-}
-
-.boxsizingBorder {
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-}
+.md-toast-error   {background-color: #ffb0b0;}
+.md-toast-success {background-color: #c3fdb8;}
+.md-toast-info    {background-color: #82cafa;}
+.md-toast-warning {background-color: #fff7a7;}
