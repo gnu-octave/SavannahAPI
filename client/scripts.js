@@ -12,7 +12,11 @@ $(document).ready(function(){
   defaultQueries.forEach(e =>
     new QueryWidget(queries, new Query(e.label, e.url, e.api, ''))
     );
-  new QueryWidget(queries, Query.getDefault());
+  new QueryWidget(queries, Query.getDefault(), false);
+
+  $('.collapser').click(function() {
+    $(this).next().collapse('toggle');
+  });
   });
 
 
@@ -29,7 +33,7 @@ class Query {
   static getDefault() {
     var value = document.location.search.substring(1);
     value = (value ? value : localStorage.getItem("defaultQuery"));
-    return new Query('', '', value, '');
+    return new Query('New query', '', value, '');
   }
   static getFromGETParams() {
     return new Query('', '', localStorage.getItem("defaultQuery"), '');;
@@ -89,16 +93,18 @@ class QueryWidgetList {
 
 
 class QueryWidget {
-  constructor(parentNode, query) {
+  constructor(parentNode, query, readonly=true) {
     this.parentNode = parentNode;
     this.query = query;
+    this.readonly = readonly;
 
     // Widgets that need access.
-    this.updateButton = null;
+    this.refreshButton = null;
+    this.editButton = null;
     this.saveButton = null;
+    this.cancelButton = null;
     this.copyButton = null;
     this.parameter = null;
-    this.loading = null;
     this.label = null;
     this.url = null;
 
@@ -109,79 +115,161 @@ class QueryWidget {
 
   getNode() {
     const self = this;
-    var query = this.query;
+    var query  = this.query;
     var params = query.getPermaLinkParams().replaceAll("&", "\n");
+    var labelHTML   = "";
+    var buttonsHTML = "";
+    var formHTML    = "";
     var element = document.createElement(null);
-    element.innerHTML = `
-    <details class="m-2 p-1">
-      <summary class="container-fluid">
-        <span class="badge badge-secondary badge-pill">
-          ${query.getResultCount()}
-        </span>
-        <input type="text" value="${query.getLabel()}">
-        <button type="button">
-          <span class="spinner-border spinner-border-sm d-none"
-                role="status" aria-hidden="true"></span>
-          Update
+    if (this.readonly) {
+      labelHTML = `
+        <span class="font-weight-bold">${query.getLabel()}</span>`;
+      buttonsHTML = `
+        <button type="button" class="btn btn-sm btn-secondary form-control">
+          <i class="far fa-edit"></i>
+        </button>`
+    } else {
+      labelHTML = `
+        <input type="text" class="form-control" value="${query.getLabel()}">`;
+      buttonsHTML = `
+        <button type="button" class="btn btn-sm btn-success form-control">
+          <i class="far fa-save"></i>
         </button>
-        <button type="button">Save changes</button>
-        <button type="button">Copy permalink</button>
-      </summary>
-      <div class="my-3"></div>
+        <button type="button" class="btn btn-sm btn-danger form-control">
+          <i class="fas fa-ban"></i>
+        </button>`
+      formHTML = `
       <div class="form-group input-group">
         <div class="input-group-prepend">
           <div class="input-group-text">url</div>
         </div>
-        <input type="url" value=${query.getURL()} class="form-control">
+        <input type="url" value="${query.getURL()}" class="form-control">
       </div>
       <div class="form-group input-group">
         <div class="input-group-prepend">
           <div class="input-group-text">API parameter</div>
         </div>
-        <textarea class="form-control form-control-lg">${params}</textarea>
+        <textarea class="form-control">${params}</textarea>
+      </div>`;
+    }
+    element.innerHTML = `
+    <div class="accordion m-1">
+      <div class="card">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-1">
+              <button type="button"
+                      class="btn btn-sm btn-secondary"
+                      data-toggle="collapse"
+                      data-target=""
+                      aria-expanded="true">&nbsp;+&nbsp;</button>
+            </div>
+            <div class="col">
+              <div class="row">
+                <div class="col">
+                  <span class="badge badge-info badge-pill">
+                    ${query.getResultCount()}
+                  </span>
+                </div>
+                <div class="col-8 col-sm-9 col-lg-10 col-xl-11">
+                  ${labelHTML}
+                </div>
+              </div>
+            </div>
+            <div class="col col-md-3 col-xl-2 btn-group" role="group">
+              <button type="button"
+                      class="btn btn-sm btn-info form-control">
+                <span class="spinner-border spinner-border-sm d-none"
+                      role="status" aria-hidden="true">
+                </span>
+                <i class="fas fa-sync"></i>
+              </button>
+              ${buttonsHTML}
+              <button type="button"
+                      class="btn btn-sm btn-info form-control">
+                <i class="far fa-clipboard"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body collapse">
+          ${formHTML}
+          <div class="overflow-auto">
+            ${query.getResultHTML()}
+          </div>
+        </div>
       </div>
-
-      <div class="overflow-auto">
-        ${query.getResultHTML()}
-      </div>
-    </details>
+    </div>
     `;
     element = element.firstElementChild;
     var buttons = element.getElementsByTagName("button");  // order given above
-    this.updateButton = buttons[0];
-    this.saveButton   = buttons[1];
-    this.copyButton   = buttons[2];
-    var inputs = element.getElementsByTagName("input");
-    this.label = inputs[0];
-    this.url   = inputs[1];
-    this.parameter = element.getElementsByTagName("textarea")[0];
-    this.loading = element.getElementsByTagName("img")[0];
-
-    this.updateButton.addEventListener("click", function(event) {
+    var toggleButton   = buttons[0];
+    this.refreshButton = buttons[1];
+    if (this.readonly) {
+      this.editButton    = buttons[2];
+      this.saveButton    = null;
+      this.cancelButton  = null;
+      this.copyButton    = buttons[3];
+      this.editButton.addEventListener("click", function(event) {
+          self.toggleReadOnly();
+        });
+    } else {
+      this.editButton    = null;
+      this.saveButton    = buttons[2];
+      this.cancelButton  = buttons[3];
+      this.copyButton    = buttons[4];
+      this.cancelButton.addEventListener("click", function(event) {
+          self.toggleReadOnly();
+        });
+    }
+    toggleButton.addEventListener("click", function(event) {
+        $(this).closest("div.card").children("div.card-body").collapse("toggle");
+      });
+    this.refreshButton.addEventListener("click", function(event) {
         self.send();
       });
     this.copyButton.addEventListener("click", function(event) {
         var temp = $("<input>");
         $("body").append(temp);
-        temp.val(self.getChangesAsQuery().getPermaLink()).select();
+        temp.val(self.getQuery().getPermaLink()).select();
         document.execCommand("copy");
         temp.remove();
+        showPopup("info", "Permalink copied to clipboard.");
       });
-    var adjustHeight = function(event) {
-      this.style.height = "1px";
-      this.style.height = this.scrollHeight + "px";
-      };
 
-    this.parameter.addEventListener("keyup",  adjustHeight);
-    this.parameter.addEventListener("change", adjustHeight);
+    if (this.readonly) {
+      this.label     = null;
+      this.url       = null;
+      this.parameter = null;
+    } else {
+      var inputs = element.getElementsByTagName("input");
+      this.label = inputs[0];
+      this.url   = inputs[1];
+      this.parameter = element.getElementsByTagName("textarea")[0];
+      var adjustHeight = function(event) {
+        this.style.height = "1px";
+        this.style.height = this.scrollHeight + "px";
+        };
+      this.parameter.addEventListener("keyup",  adjustHeight);
+      this.parameter.addEventListener("change", adjustHeight);
+    }
 
     return element;
+  }
+
+  toggleReadOnly() {
+    this.readonly = !this.readonly;
+    this.repaint();
   }
 
   repaint() {
     var old = this.node;
     this.node = this.getNode();
-    this.node.open = old.open;
+
+    if ($(old).find('div.card-body')[0].classList.contains("show")) {
+      $(this.node).find('div.card-body')[0].classList.add("show");
+    }
+
     this.parentNode.replaceChild(this.node, old);
   }
 
@@ -190,33 +278,37 @@ class QueryWidget {
     this.repaint();
   }
 
-  getChangesAsQuery() {
-    return new Query(this.label.value, this.url.value,
-                     this.parameter.value, '');
+  getQuery() {
+    return ((this.readonly)
+            ? this.query
+            : new Query(this.label.value, this.url.value,
+                        this.parameter.value, this.query.getResultHTML()));
   }
 
   markBusy() {
-    this.updateButton.disabled = true;
-    var span = this.updateButton.getElementsByTagName("span")[0];
+    this.refreshButton.disabled = true;
+    var span = this.refreshButton.getElementsByTagName("span")[0];
     span.classList.toggle("d-none");
     span.classList.toggle("d-inline-block");
   }
 
   markFree() {
-    this.updateButton.disabled = false;
-    var span = this.updateButton.getElementsByTagName("span")[0];
+    this.refreshButton.disabled = false;
+    var span = this.refreshButton.getElementsByTagName("span")[0];
     span.classList.toggle("d-none");
     span.classList.toggle("d-inline-block");
   }
 
-  send(options) {
+  send(params) {
+    params = (params ? params : {});
     const self = this;
-    var query = this.getChangesAsQuery();
+    var query = this.getQuery();
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == XMLHttpRequest.DONE) {
         self.markFree();
-        apiRequestResultHandle(this, self, options);
+        params.queryForm = self;
+        apiRequestHandleResult(this, params);
       }};
     xhttp.open("GET", "api.php?" + query.getPermaLinkParams(), true);
     xhttp.send();
@@ -270,7 +362,8 @@ function apiUpdateItem(node, tracker, id) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == XMLHttpRequest.DONE) {
-      apiRequestResultHandle(this);
+      apiRequestHandleResult(this,
+                             {message: "<b>" + tracker + " #" + id + "</b>"});
     }};
   xhttp.open("GET", "api.php?Action=update&TrackerID=" + tracker
                     + "&ItemID=" + id, true);
@@ -279,22 +372,32 @@ function apiUpdateItem(node, tracker, id) {
 }
 
 
-function apiRequestResultHandle(request, queryForm, options) {
+function apiRequestHandleResult(request, params) {
   if (request.status == 200) {
+    var answer = request.responseText;
+    params = (params ? params : {});
+    /**
+     * The API server will answer with either a JSON string of the form:
+     *
+     *   {"state": ["success", "error", "warning", "info"], "message": string}
+     *
+     * or with a plain string containing the queried result, for example.
+     */
     try {
-      var answer = JSON.parse(request.responseText);
+      var answer = JSON.parse(answer);
     } catch (e) {
       // ignore
     }
-    if (answer && answer.state) {
-      showPopup(answer.state, answer.message);
-    } else if (queryForm) {
-      queryForm.setResultHTML(request.responseText);
-      if (options && !options.silent) {
+    if (answer.state) {
+      showPopup(answer.state, (params.message ? params.message + ' ' : '')
+                              + answer.message);
+    } else if (params.queryForm) {
+      params.queryForm.setResultHTML(request.responseText);
+      if (!params.silent) {
         showPopup("success", "");
       }
     } else {
-      showPopup("error", request.responseText);
+      showPopup("warning", "Unknown server response: " + request.responseText);
     }
   } else {
     showPopup("error", "Request failed: " + request.responseText);

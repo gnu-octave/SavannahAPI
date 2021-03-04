@@ -344,12 +344,14 @@ class api
         list($item, $discussion) = $crawler->crawlItem($tracker, $id);
         if (isset($item) && isset($discussion)) {
           $db->update($item, $discussion);
+        } else {
+          return $this->JSON("error",
+                             "Invalid ItemID '$id' for TrackerID '$tracker'.");
         }
       }
     }
 
-    return $this->JSON("success",
-      "Update successful.  Please reload this table or website.");
+    return $this->JSON("success",  "Update successful.");
   }
 
 
