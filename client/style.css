@@ -29,3 +29,17 @@ table td {
 .md-toast-success {background-color: #c3fdb8;}
 .md-toast-info    {background-color: #82cafa;}
 .md-toast-warning {background-color: #fff7a7;}
+
+.card-header-mod {
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+}
+
+@media (min-width: 575.98px) {
+  .button-width-mod { min-width: 85px; }
+}
+
+.table-hover tbody tr:hover {
+  color:#212529 !important;
+  background-color:rgba(0,0,0,.075) !important;
+}

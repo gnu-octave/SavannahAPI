@@ -95,19 +95,19 @@ class formatter
   }
 
   /**
-   * Retrieve Savannah css class from item's priority.
+   * Retrieve Savannah css background-color from item's priority.
    *
    * @param item associative array with fields given in the "database column"
    *             of `CONST::ITEM_DATA`.
    *
-   * @returns a string with the css class attribute.
+   * @returns a string with the css background-color attribute.
    */
-  private function addCSS($item)
+  private function addCSSRowColor($item)
   {
     // Translate something like "5 - Normal" to "e", etc.
     $color = $this->CSS_COLORS[$item['OpenClosed']]
                               [((int) $item['Priority'][0]) - 1];
-    return " style=\"background-color: $color; padding: 5px;\"";
+    return " style=\"background-color: $color;\"";
   }
 
 
@@ -147,12 +147,15 @@ class formatter
   {
     $css = ($color) ? ' style="background-color: powderblue; padding: 5px;"'
                     : '';
-    $str = '<tr>' . (($color) ? "<th$css>&nbsp;</th>" : '')
-           . "<th$css>" . implode("</th><th$css>", $columns) . '</th></tr>';
+    $thead = '<tr>' . (($color) ? "<th$css>&nbsp;</th>" : '')
+             . "<th$css>" . implode("</th><th$css>", $columns) . '</th></tr>';
+    $thead = "<thead>$thead</thead>";
+    $tbody = '';
     foreach ($this->items as $item) {
       $item = $this->idsToString($item);
       $item = $this->timestampToString($item);
-      $css = ($color) ? $this->addCSS($item) : '';
+      $css   = ($color) ? ' style="padding: 5px;"' : '';
+      $trCSS = ($color) ? $this->addCSSRowColor($item) : '';
       if ($color) {
         $item = $this->addURLs($item);
       }
@@ -161,10 +164,11 @@ class formatter
       foreach ($item as $col) {
         $item_str .= "<td$css>$col</td>";
       }
-      $str .= "<tr>$item_str</tr>";
+      $tbody .= "<tr$trCSS>$item_str</tr>";
     }
+    $tbody = "<tbody>$tbody</tbody>";
     $css = ($color) ? ' style="border-collapse: collapse;"' : '';
-    return "<table$css>$str</table>";
+    return "<table$css>$thead$tbody</table>";
   }
 
   /**

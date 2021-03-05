@@ -14,9 +14,9 @@ $(document).ready(function(){
     );
   new QueryWidget(queries, Query.getDefault(), false);
 
-  $('.collapser').click(function() {
-    $(this).next().collapse('toggle');
-  });
+  $(".collapser").click(function() {
+    $(this).next().collapse("toggle");
+    });
   });
 
 
@@ -66,7 +66,7 @@ class Query {
     }
     if (this.result.substr(0, 6) === "<table") {
       // ignore head line
-      return (this.result.match(/<tr>/g) || []).length - 1;
+      return (this.result.match(/<tr/g) || []).length - 1;
     } else {
       try {
         return JSON.parse(this.result).length;
@@ -100,10 +100,6 @@ class QueryWidget {
 
     // Widgets that need access.
     this.refreshButton = null;
-    this.editButton = null;
-    this.saveButton = null;
-    this.cancelButton = null;
-    this.copyButton = null;
     this.parameter = null;
     this.label = null;
     this.url = null;
@@ -117,28 +113,29 @@ class QueryWidget {
     const self = this;
     var query  = this.query;
     var params = query.getPermaLinkParams().replaceAll("&", "\n");
-    var labelHTML   = "";
-    var buttonsHTML = "";
-    var formHTML    = "";
     var element = document.createElement(null);
     if (this.readonly) {
-      labelHTML = `
-        <span class="font-weight-bold">${query.getLabel()}</span>`;
-      buttonsHTML = `
-        <button type="button" class="btn btn-sm btn-secondary form-control">
-          <i class="far fa-edit"></i>
-        </button>`
+      var labelHTML = `
+        <div class="font-weight-bold mt-2">${query.getLabel()}</div>`;
+      var buttonsEditClass = "secondary";
+      var buttonsEditIcon  = "far fa-edit";
+      var buttonsHTML = "";
+      var formHTML = "";
     } else {
-      labelHTML = `
+      var labelHTML = `
         <input type="text" class="form-control" value="${query.getLabel()}">`;
-      buttonsHTML = `
-        <button type="button" class="btn btn-sm btn-success form-control">
-          <i class="far fa-save"></i>
-        </button>
-        <button type="button" class="btn btn-sm btn-danger form-control">
-          <i class="fas fa-ban"></i>
-        </button>`
-      formHTML = `
+      var buttonsEditClass = "warning";
+      var buttonsEditIcon  = "fas fa-ban";
+      var buttonsHTML = `
+        <div class="btn-group w-100 mt-1" role="group">
+          <button type="button" class="btn btn-success form-control">
+            <i class="far fa-save"></i>
+          </button>
+          <button type="button" class="btn btn-danger form-control">
+            <i class="far fa-trash-alt"></i>
+          </button>
+        </div>`;
+      var formHTML = `
       <div class="form-group input-group">
         <div class="input-group-prepend">
           <div class="input-group-text">url</div>
@@ -155,40 +152,39 @@ class QueryWidget {
     element.innerHTML = `
     <div class="accordion m-1">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header card-header-mod">
           <div class="row">
-            <div class="col-1">
+            <div class="col-3 col-md-2 col-lg-2">
               <button type="button"
-                      class="btn btn-sm btn-secondary"
+                      class="btn btn-info button-width-mod"
                       data-toggle="collapse"
                       data-target=""
-                      aria-expanded="true">&nbsp;+&nbsp;</button>
+                      aria-expanded="true">
+                &nbsp;<i class="fas fa-plus"></i>&nbsp;
+                <span class="badge badge-pill badge-light">
+                  ${query.getResultCount()}
+                </span>
+              </button>
             </div>
             <div class="col">
-              <div class="row">
-                <div class="col">
-                  <span class="badge badge-info badge-pill">
-                    ${query.getResultCount()}
-                  </span>
-                </div>
-                <div class="col-8 col-sm-9 col-lg-10 col-xl-11">
-                  ${labelHTML}
-                </div>
-              </div>
+              ${labelHTML}
             </div>
-            <div class="col col-md-3 col-xl-2 btn-group" role="group">
-              <button type="button"
-                      class="btn btn-sm btn-info form-control">
-                <span class="spinner-border spinner-border-sm d-none"
-                      role="status" aria-hidden="true">
-                </span>
-                <i class="fas fa-sync"></i>
-              </button>
+            <div class="col col-md-3">
+              <div class="btn-group w-100" role="group">
+                <button type="button"
+                        class="btn btn-info form-control">
+                  <i class="fas fa-sync"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-${buttonsEditClass} form-control">
+                  <i class="${buttonsEditIcon}"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-info form-control">
+                  <i class="far fa-clipboard"></i>
+                </button>
+              </div>
               ${buttonsHTML}
-              <button type="button"
-                      class="btn btn-sm btn-info form-control">
-                <i class="far fa-clipboard"></i>
-              </button>
             </div>
           </div>
         </div>
@@ -204,31 +200,19 @@ class QueryWidget {
     element = element.firstElementChild;
     var buttons = element.getElementsByTagName("button");  // order given above
     var toggleButton   = buttons[0];
+        toggleButton.addEventListener("click", function(event) {
+          $(this).closest("div.card").children("div.card-body").collapse("toggle");
+        });
     this.refreshButton = buttons[1];
-    if (this.readonly) {
-      this.editButton    = buttons[2];
-      this.saveButton    = null;
-      this.cancelButton  = null;
-      this.copyButton    = buttons[3];
-      this.editButton.addEventListener("click", function(event) {
-          self.toggleReadOnly();
-        });
-    } else {
-      this.editButton    = null;
-      this.saveButton    = buttons[2];
-      this.cancelButton  = buttons[3];
-      this.copyButton    = buttons[4];
-      this.cancelButton.addEventListener("click", function(event) {
-          self.toggleReadOnly();
-        });
-    }
-    toggleButton.addEventListener("click", function(event) {
-        $(this).closest("div.card").children("div.card-body").collapse("toggle");
-      });
     this.refreshButton.addEventListener("click", function(event) {
         self.send();
       });
-    this.copyButton.addEventListener("click", function(event) {
+    var editButton = buttons[2];
+        editButton.addEventListener("click", function(event) {
+        self.toggleReadOnly();
+      });
+    var copyButton = buttons[3];
+        copyButton.addEventListener("click", function(event) {
         var temp = $("<input>");
         $("body").append(temp);
         temp.val(self.getQuery().getPermaLink()).select();
@@ -242,6 +226,13 @@ class QueryWidget {
       this.url       = null;
       this.parameter = null;
     } else {
+      var saveButton = buttons[4];
+      var cancelButton = buttons[5];
+          cancelButton.addEventListener("click", function(event) {
+          self.toggleReadOnly();
+        });
+      var deleteButton = buttons[6];
+
       var inputs = element.getElementsByTagName("input");
       this.label = inputs[0];
       this.url   = inputs[1];
@@ -266,6 +257,11 @@ class QueryWidget {
     var old = this.node;
     this.node = this.getNode();
 
+    $(this.node).find("table").addClass("table");
+    $(this.node).find("table").addClass("table-borderless");
+    $(this.node).find("table").addClass("table-hover");
+    $(this.node).find("table").addClass("table-responsive");
+
     if ($(old).find('div.card-body')[0].classList.contains("show")) {
       $(this.node).find('div.card-body')[0].classList.add("show");
     }
@@ -286,17 +282,13 @@ class QueryWidget {
   }
 
   markBusy() {
-    this.refreshButton.disabled = true;
-    var span = this.refreshButton.getElementsByTagName("span")[0];
-    span.classList.toggle("d-none");
-    span.classList.toggle("d-inline-block");
+    $(this.refreshButton).disabled = true;
+    $(this.refreshButton).children('i')[0].classList.toggle("fa-spin");
   }
 
   markFree() {
-    this.refreshButton.disabled = false;
-    var span = this.refreshButton.getElementsByTagName("span")[0];
-    span.classList.toggle("d-none");
-    span.classList.toggle("d-inline-block");
+    $(this.refreshButton).disabled = false;
+    $(this.refreshButton).children('i')[0].classList.toggle("fa-spin");
   }
 
   send(params) {
