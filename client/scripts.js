@@ -7,6 +7,26 @@ var queryList;
 $(document).ready(function(){
   queryList = new QueryWidgetList($("#queries")[0], $("#appImportExport")[0]);
 
+  $("#quickSearchClearButton").click(function(event) {
+      $("#quickSearchResult")[0].innerHTML = "";
+      $("#quickSearchInput")[0].value = "";
+    });
+  $("#quickSearchSubmitButton").click(function(event) {
+      var qstring = 'Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=';
+      qstring += $("#quickSearchInput")[0].value.trim().replaceAll(' ', '%20');
+      var query = new Query('', '', qstring, '');
+      var xhttp = new XMLHttpRequest();
+      var params = {queryQuick: $("#quickSearchResult")[0]};
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == XMLHttpRequest.DONE) {
+          //self.markFree();
+          apiRequestHandleResult(this, params);
+        }};
+      xhttp.open("GET", "api.php?" + query.getPermaLinkParams(), true);
+      xhttp.send();
+      //self.markBusy();
+    });
+
   $("#newQueryButton").click(function(event) {
       queryList.add(Query.getDefault());
     });
@@ -315,6 +335,8 @@ class QueryWidget {
     } else {
       var saveButton = buttons[4];
           saveButton.addEventListener("click", function(event) {
+              self.query = self.getQuery();
+              self.list.save();
               self.toggleReadOnly();
             });
       var deleteButton = buttons[5];
@@ -413,6 +435,9 @@ function apiRequestHandleResult(request, params) {
       if (!params.silent) {
         showPopup("success", "");
       }
+    } else if (params.queryQuick) {
+      params.queryQuick.innerHTML = request.responseText;
+      showPopup("success", "");
     } else {
       showPopup("warning", "Unknown server response: " + request.responseText);
     }

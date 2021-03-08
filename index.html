@@ -32,6 +32,27 @@
   <div id="queries" class="container-xl">
     <h1 class="my-3 p-2">GNU Octave - Savannah Bugs and Patches</h1>
     <noscript>JavaScript must be enabled to run this tool.</noscript>
+    <div class="m-1">
+      <div class="form-group input-group">
+        <div class="input-group-prepend">
+          <button type="button" id="quickSearchSubmitButton"
+                  class="btn btn-lg btn-info">
+            Quick search
+          </button>
+        </div>
+        <input type="text" id="quickSearchInput"
+               class="form-control form-control-lg">
+        <div class="input-group-append">
+          <button type="button" id="quickSearchClearButton"
+                  class="btn btn-lg btn-secondary">
+            <i class="fas fa-ban"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="quickSearchResult">
+    </div>
+    <h5 class="p-2">Saved queries</h5>
   </div>
   <div class="container-xl">
     <div class="d-flex justify-content-center my-2">
