@@ -33,11 +33,37 @@
     <h1 class="my-3 p-2">GNU Octave - Savannah Bugs and Patches</h1>
     <noscript>JavaScript must be enabled to run this tool.</noscript>
   </div>
-  <div class="d-flex justify-content-center my-2">
-    <button id="newQueryButton" type="button"
-            class="btn btn-secondary">
-      &nbsp;&nbsp;<i class="fas fa-plus"></i>&nbsp;&nbsp;
-    </button>
+  <div class="container-xl">
+    <div class="d-flex justify-content-center my-2">
+      <button id="newQueryButton" type="button"
+              class="btn btn-secondary">
+        &nbsp;&nbsp;<i class="fas fa-plus"></i>&nbsp;&nbsp;
+      </button>
+    </div>
+
+    <details>
+      <summary>Settings</summary>
+      <div class="btn-group w-100" role="group">
+        <button type="button" id="settingsCopy"
+                class="btn btn-info form-control">
+          <i class="far fa-clipboard"></i> Copy JSON
+        </button>
+        <button type="button" id="settingsImport"
+                class="btn btn-warning form-control">
+          <i class="fas fa-upload"></i> Import JSON
+        </button>
+        <button type="button" id="settingsReset"
+                class="btn btn-danger form-control">
+          <i class="fas fa-exclamation-triangle"></i> Reset to default
+        </button>
+      </div>
+      <div class="form-group input-group">
+        <div class="input-group-prepend">
+          <div class="input-group-text">JSON data</div>
+        </div>
+        <textarea id="appImportExport" class="form-control"></textarea>
+      </div>
+    </details>
   </div>
 </div>
 

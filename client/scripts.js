@@ -7,9 +7,26 @@ var queryList;
 $(document).ready(function(){
   queryList = new QueryWidgetList($("#queries")[0], $("#appImportExport")[0]);
 
-  $("#newQueryButton").click(function() { queryList.add(Query.getDefault()) });
-
-  $(".collapser").click(function() { $(this).next().collapse("toggle"); });
+  $("#newQueryButton").click(function(event) {
+      queryList.add(Query.getDefault());
+    });
+  $("#settingsCopy").click(function(event) {
+      copyToClipboard($("#appImportExport")[0].value);
+    });
+  $("#settingsImport").click(function(event) {
+      queryList.reset($("#appImportExport")[0].value);
+      showPopup("warning", "JSON import successful.");
+    });
+  $("#settingsReset").click(function(event) {
+      queryList.reset();
+      showPopup("warning", "Reset successful.");
+    });
+  $(".collapser").click(function(event) {
+      $(this).next().collapse("toggle");
+    });
+  $("#appImportExport")[0].addEventListener("change", adjustHeight);
+  $("#appImportExport")[0].addEventListener("focus",  adjustHeight);
+  $("#appImportExport")[0].addEventListener("keyup",  adjustHeight);
 });
 
 
@@ -18,12 +35,32 @@ class QueryWidgetList {
     this.items = [];
     this.rootNode         = rootNode;
     this.importExportNode = importExportNode;
-    this.custom  = JSON.parse(localStorage.getItem("customQueries"));
-    this.default = JSON.parse(localStorage.getItem("defaultQueries"));
-    if (!this.custom) {
-      this.custom = this.default;
+
+    var customQueries  = JSON.parse(localStorage.getItem("customQueries"));
+    var defaultQueries = JSON.parse(localStorage.getItem("defaultQueries"));
+    if (!customQueries || (customQueries.length == 0)) {
+      customQueries = defaultQueries;
     }
-    this.default.forEach(e => this.add(new Query(e.label, e.url, e.api, '')));
+    customQueries.forEach(e => this.add(new Query(e.label, e.url, e.api, ''),
+                                        {silent: true, readonly: true,
+                                         save: false}));
+    this.save();
+  }
+
+  reset(jsonString = "") {
+    var self = this;
+    localStorage.removeItem("customQueries");
+    this.items.forEach(item => self.remove(item));
+    if (jsonString) {
+      localStorage.setItem("customQueries", jsonString);
+    }
+    queryList = new QueryWidgetList(this.rootNode, this.importExportNode);
+  }
+
+  save() {
+    var jsonString = this.getCustomQueriesJSON();
+    localStorage.setItem("customQueries", jsonString);
+    this.importExportNode.value = jsonString;
   }
 
   update(item, newNode) {
@@ -35,17 +72,30 @@ class QueryWidgetList {
     }
   }
 
-  getDefaultQueriesJSON () { return JSON.stringify(this.default); }
-  getCustomQueriesJSON  () { return JSON.stringify(this.custom);  }
-
-  save() {
-    localStorage.setItem("customQueries", this.getCustomQueriesJSON());
+  remove(item) {
+    this.rootNode.removeChild(item.getNode());
+    this.items = this.items.filter(function(e){ return e!= item; });
+    this.save();
   }
 
-  add(query, options={silent: true, readonly: true}) {
+  getCustomQueriesJSON() {
+    var queries = [];
+    this.items.forEach(function (item) {
+        var q = item.getQuery();
+        delete q.result;
+        delete q.resultCount;
+        queries.push(q);
+      });
+    return JSON.stringify(queries);
+  }
+
+  add(query, options={silent: true, readonly: true, save: true}) {
     var widget = new QueryWidget(this, query, options);
+        widget.send(options);
     this.items.push(widget);
-    widget.send(options);
+    if (options.save) {
+      this.save();
+    }
   }
 }
 
@@ -56,8 +106,10 @@ class QueryWidgetList {
 class Query {
   constructor(label, url, apiParams, result) {
     this.label  = label;
-    this.url    = url;
     this.api    = apiParams.trim().replaceAll(/\s+/g, "&");
+    this.url    = url;
+    this.result = "";
+    this.resultCount = 0;
     this.setResultHTML(result);
   }
   static getDefault() {
@@ -151,7 +203,12 @@ class QueryWidget {
     var element = document.createElement(null);
     if (this.readonly) {
       var labelHTML = `
-        <div class="font-weight-bold mt-2">${query.getLabel()}</div>`;
+        <div class="font-weight-bold mt-2">
+          ${query.getLabel()}
+          ${(query.getURL()
+            ? `&nbsp;&nbsp;<a href="${query.getURL()}">[link]</a>`
+            : "")}
+        </div>`;
       var buttonsEditClass = "secondary";
       var buttonsEditIcon  = "far fa-edit";
       var buttonsHTML = "";
@@ -242,19 +299,14 @@ class QueryWidget {
     this.refreshButton.addEventListener("click", function(event) {
         self.send();
       });
-    var editButton = buttons[2];
-        editButton.addEventListener("click", function(event) {
-        self.toggleReadOnly();
-      });
+    var editCancelButton = buttons[2];
+        editCancelButton.addEventListener("click", function(event) {
+            self.toggleReadOnly();
+          });
     var copyButton = buttons[3];
-        copyButton.addEventListener("click", function(event) {
-        var temp = $("<input>");
-        $("body").append(temp);
-        temp.val(self.getQuery().getPermaLink()).select();
-        document.execCommand("copy");
-        temp.remove();
-        showPopup("info", "Copied to clipboard.");
-      });
+        copyButton.addEventListener("click",function(event) {
+            copyToClipboard(self.getQuery().getPermaLink())
+          });
 
     if (this.readonly) {
       this.label     = null;
@@ -265,20 +317,15 @@ class QueryWidget {
           saveButton.addEventListener("click", function(event) {
               self.toggleReadOnly();
             });
-      var cancelButton = buttons[5];
-          cancelButton.addEventListener("click", function(event) {
-              self.toggleReadOnly();
+      var deleteButton = buttons[5];
+          deleteButton.addEventListener("click", function(event) {
+              self.list.remove(self);
             });
-      var deleteButton = buttons[6];
 
       var inputs = element.getElementsByTagName("input");
       this.label = inputs[0];
       this.url   = inputs[1];
       this.parameter = element.getElementsByTagName("textarea")[0];
-      var adjustHeight = function(event) {
-        this.style.height = "1px";
-        this.style.height = this.scrollHeight + "px";
-        };
       this.parameter.addEventListener("change", adjustHeight);
       this.parameter.addEventListener("focus",  adjustHeight);
       this.parameter.addEventListener("keyup",  adjustHeight);
@@ -328,47 +375,6 @@ class QueryWidget {
 }
 
 
-function showPopup(type, message) {
-  var delay = 10000;  // milliseconds
-  var headText = "Info";
-  switch(type) {
-    case "warning":
-      headText = "⚠️ Warning";
-      break;
-    case "error":
-      headText = "❌ Error";
-      delay *= 10;
-      break;
-    case "success":
-      headText = "✅ Success";
-      break;
-    default:
-      type = "info";
-  }
-  var element = document.createElement(null);
-  element.innerHTML = `
-  <div role="alert" aria-life="assertive" aria-atomic="true"
-       class="toast md-toast-${type}">
-    <div class="toast-header md-toast-${type}">
-      <strong class="mr-auto">${headText}</strong>
-      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast"
-              aria-label="Close">
-        <span aria-hidden="true">×</span>
-      </button>
-    </div>
-    <div class="toast-body md-toast-${type}">
-      ${message}
-    </div>
-  </div>
-  `;
-  element = element.firstElementChild;
-  document.getElementById("toasts").appendChild(element);
-  $(element).toast({delay: delay});
-  $(element).toast('show');
-  setTimeout(function(){ element.remove(); }, delay);
-}
-
-
 function apiUpdateItem(node, tracker, id) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -413,4 +419,63 @@ function apiRequestHandleResult(request, params) {
   } else {
     showPopup("error", "Request failed: " + request.responseText);
   }
+}
+
+
+/**
+ * Global helper functions.
+ */
+
+function showPopup(type, message) {
+  var delay = 10000;  // milliseconds
+  var headText = "Info";
+  switch(type) {
+    case "warning":
+      headText = "⚠️ Warning";
+      break;
+    case "error":
+      headText = "❌ Error";
+      delay *= 10;
+      break;
+    case "success":
+      headText = "✅ Success";
+      break;
+    default:
+      type = "info";
+  }
+  var element = document.createElement(null);
+  element.innerHTML = `
+  <div role="alert" aria-life="assertive" aria-atomic="true"
+       class="toast md-toast-${type}">
+    <div class="toast-header md-toast-${type}">
+      <strong class="mr-auto">${headText}</strong>
+      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast"
+              aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="toast-body md-toast-${type}">
+      ${message}
+    </div>
+  </div>
+  `;
+  element = element.firstElementChild;
+  $("#toasts")[0].appendChild(element);
+  $(element).toast({delay: delay});
+  $(element).toast('show');
+  setTimeout(function(){ element.remove(); }, delay);
+}
+
+function adjustHeight() {
+  this.style.height = "1px";
+  this.style.height = this.scrollHeight + "px";
+}
+
+function copyToClipboard(str) {
+  var temp = $("<input>");
+  $("body").append(temp);
+  temp.val(str).select();
+  document.execCommand("copy");
+  temp.remove();
+  showPopup("info", "Copied to clipboard.");
 }
