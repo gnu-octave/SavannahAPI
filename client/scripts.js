@@ -2,22 +2,52 @@
  * Global variables.
  */
 var queryList;
-var queryEditWidget;
 
 
 $(document).ready(function(){
-  var queries = document.getElementById("queries");
-  queryList = new QueryWidgetList();
-  var defaultQueries = JSON.parse(localStorage.getItem("defaultQueries"));
-  defaultQueries.forEach(e =>
-    new QueryWidget(queries, new Query(e.label, e.url, e.api, ''))
-    );
-  new QueryWidget(queries, Query.getDefault(), false);
+  queryList = new QueryWidgetList($("#queries")[0], $("#appImportExport")[0]);
 
-  $(".collapser").click(function() {
-    $(this).next().collapse("toggle");
-    });
-  });
+  $("#newQueryButton").click(function() { queryList.add(Query.getDefault()) });
+
+  $(".collapser").click(function() { $(this).next().collapse("toggle"); });
+});
+
+
+class QueryWidgetList {
+  constructor(rootNode, importExportNode) {
+    this.items = [];
+    this.rootNode         = rootNode;
+    this.importExportNode = importExportNode;
+    this.custom  = JSON.parse(localStorage.getItem("customQueries"));
+    this.default = JSON.parse(localStorage.getItem("defaultQueries"));
+    if (!this.custom) {
+      this.custom = this.default;
+    }
+    this.default.forEach(e => this.add(new Query(e.label, e.url, e.api, '')));
+  }
+
+  update(item, newNode) {
+    var old = item.getNode();
+    if (old) {
+      this.rootNode.replaceChild(newNode, old);
+    } else {
+      this.rootNode.appendChild(newNode);
+    }
+  }
+
+  getDefaultQueriesJSON () { return JSON.stringify(this.default); }
+  getCustomQueriesJSON  () { return JSON.stringify(this.custom);  }
+
+  save() {
+    localStorage.setItem("customQueries", this.getCustomQueriesJSON());
+  }
+
+  add(query, options={silent: true, readonly: true}) {
+    var widget = new QueryWidget(this, query, options);
+    this.items.push(widget);
+    widget.send(options);
+  }
+}
 
 
 /**
@@ -79,37 +109,42 @@ class Query {
 }
 
 
-class QueryWidgetList {
-  constructor() {
-    this.savedQueries = JSON.parse(localStorage.getItem("savedQueries"));
-  }
-  getQueries () {
-    return this.savedQueries;
-  }
-  save () {
-    localStorage.setItem("savedQueries", JSON.stringify(savedQueries));
-  }
-}
-
-
 class QueryWidget {
-  constructor(parentNode, query, readonly=true) {
-    this.parentNode = parentNode;
-    this.query = query;
-    this.readonly = readonly;
+  constructor(list, query, options) {
+    this.list     = list;
+    this.query    = query;
+    this.readonly = options.readonly;
 
-    // Widgets that need access.
-    this.refreshButton = null;
-    this.parameter = null;
-    this.label = null;
+    // Sub-widgets that need access.
     this.url = null;
+    this.label = null;
+    this.parameter = null;
+    this.refreshButton = null;
 
-    this.node = this.getNode();
-    this.parentNode.appendChild(this.node);
-    this.send({silent: true});
+    this.node = null;
+    this.repaint();
   }
 
-  getNode() {
+  toggleReadOnly() {
+    this.readonly = !this.readonly;
+    this.repaint();
+  }
+
+  setResultHTML(result) {
+    this.query.setResultHTML(result);
+    this.repaint();
+  }
+
+  getNode() { return this.node };
+
+  getQuery() {
+    return ((this.readonly)
+            ? this.query
+            : new Query(this.label.value, this.url.value,
+                        this.parameter.value, this.query.getResultHTML()));
+  }
+
+  repaint() {
     const self = this;
     var query  = this.query;
     var params = query.getPermaLinkParams().replaceAll("&", "\n");
@@ -156,12 +191,12 @@ class QueryWidget {
           <div class="row">
             <div class="col-3 col-md-2 col-lg-2">
               <button type="button"
-                      class="btn btn-info button-width-mod"
+                      class="btn btn-info button-width-mod text-left"
                       data-toggle="collapse"
                       data-target=""
                       aria-expanded="true">
                 &nbsp;<i class="fas fa-plus"></i>&nbsp;
-                <span class="badge badge-pill badge-light">
+                <span class="badge badge-pill badge-light badge-light-mod">
                   ${query.getResultCount()}
                 </span>
               </button>
@@ -218,7 +253,7 @@ class QueryWidget {
         temp.val(self.getQuery().getPermaLink()).select();
         document.execCommand("copy");
         temp.remove();
-        showPopup("info", "Permalink copied to clipboard.");
+        showPopup("info", "Copied to clipboard.");
       });
 
     if (this.readonly) {
@@ -227,10 +262,13 @@ class QueryWidget {
       this.parameter = null;
     } else {
       var saveButton = buttons[4];
+          saveButton.addEventListener("click", function(event) {
+              self.toggleReadOnly();
+            });
       var cancelButton = buttons[5];
           cancelButton.addEventListener("click", function(event) {
-          self.toggleReadOnly();
-        });
+              self.toggleReadOnly();
+            });
       var deleteButton = buttons[6];
 
       var inputs = element.getElementsByTagName("input");
@@ -241,44 +279,25 @@ class QueryWidget {
         this.style.height = "1px";
         this.style.height = this.scrollHeight + "px";
         };
-      this.parameter.addEventListener("keyup",  adjustHeight);
       this.parameter.addEventListener("change", adjustHeight);
+      this.parameter.addEventListener("focus",  adjustHeight);
+      this.parameter.addEventListener("keyup",  adjustHeight);
     }
 
-    return element;
-  }
+    $(element).find("table").addClass("table");
+    $(element).find("table").addClass("table-borderless");
+    $(element).find("table").addClass("table-hover");
+    $(element).find("table").addClass("table-responsive");
 
-  toggleReadOnly() {
-    this.readonly = !this.readonly;
-    this.repaint();
-  }
-
-  repaint() {
-    var old = this.node;
-    this.node = this.getNode();
-
-    $(this.node).find("table").addClass("table");
-    $(this.node).find("table").addClass("table-borderless");
-    $(this.node).find("table").addClass("table-hover");
-    $(this.node).find("table").addClass("table-responsive");
-
-    if ($(old).find('div.card-body')[0].classList.contains("show")) {
-      $(this.node).find('div.card-body')[0].classList.add("show");
+    // Copy state from previous node.
+    if (this.node) {
+      if ($(this.node).find('div.card-body')[0].classList.contains("show")) {
+            $(element).find('div.card-body')[0].classList.add("show");
+      }
     }
 
-    this.parentNode.replaceChild(this.node, old);
-  }
-
-  setResultHTML(result) {
-    this.query.setResultHTML(result);
-    this.repaint();
-  }
-
-  getQuery() {
-    return ((this.readonly)
-            ? this.query
-            : new Query(this.label.value, this.url.value,
-                        this.parameter.value, this.query.getResultHTML()));
+    this.list.update(this, element);
+    this.node = element;
   }
 
   markBusy() {

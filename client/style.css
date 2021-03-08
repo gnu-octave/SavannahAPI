@@ -5,39 +5,25 @@ noscript {
   display: block;
 }
 
-details {
-  background-color: beige;
-  border: 1px solid black;
-}
-
-div#footer { width: 400px; }
-
-img.loading {
-  width: 25px;
-  margin-left: 10px;
-  visibility: hidden;
-}
-
-table {
-  overflow-x: scroll;
-}
-table td {
-  white-space: nowrap;
-}
-
-.md-toast-error   {background-color: #ffb0b0;}
-.md-toast-success {background-color: #c3fdb8;}
-.md-toast-info    {background-color: #82cafa;}
-.md-toast-warning {background-color: #fff7a7;}
+.md-toast-error   { background-color: #ffb0b0; }
+.md-toast-success { background-color: #c3fdb8; }
+.md-toast-info    { background-color: #82cafa; }
+.md-toast-warning { background-color: #fff7a7; }
 
 .card-header-mod {
   padding-top: .25rem;
   padding-bottom: .25rem;
 }
 
-@media (min-width: 575.98px) {
-  .button-width-mod { min-width: 85px; }
+.badge-light-mod {
+  background-color: gold;
 }
+
+@media (min-width: 575.98px) {
+.button-width-mod { min-width: 85px; }
+}
+
+table td { white-space: nowrap; }
 
 .table-hover tbody tr:hover {
   color:#212529 !important;

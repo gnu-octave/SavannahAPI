@@ -1,17 +1,9 @@
 /**
  * Save variables to local browser storage
  */
-function initLocalStorage() {
-
-if (!localStorage.getItem("apiURL")) {
-     localStorage.setItem("apiURL",
-                          "https://octave.space/savannah/api.php");
-}
-
-if (!localStorage.getItem("defaultQuery")) {
-     localStorage.setItem("defaultQuery",
-                          "Action=get&OpenClosed=open&TrackerID=bugs&OrderBy=TrackerID,!ItemID&Limit=5&Format=HTMLCSS");
-}
+localStorage.setItem("apiURL", "https://octave.space/savannah/api.php");
+localStorage.setItem("defaultQuery",
+                     "Action=get&OpenClosed=open&TrackerID=bugs&OrderBy=TrackerID,!ItemID&Limit=5&Format=HTMLCSS");
 
 var defaultQueries = [
   {label: 'Octave 6',
@@ -52,9 +44,4 @@ var defaultQueries = [
    url:   'https://savannah.gnu.org/patch/index.php?go_report=Apply&group=octave&func=browse&set=custom&msort=0&report_id=101&advsrch=1&status_id%5B%5D=1&resolution_id%5B%5D=4&assigned_to%5B%5D=0&category_id%5B%5D=100&category_id%5B%5D=101&category_id%5B%5D=102&category_id%5B%5D=103&priority%5B%5D=0&summary=&details=&sumORdet=0&history_search=0&history_field=0&history_event=modified&history_date_dayfd=9&history_date_monthfd=2&history_date_yearfd=2020&chunksz=100&spamscore=5&boxoptionwanted=1#options'}
 ];
 
-if (!localStorage.getItem("defaultQueries")) {
-     localStorage.setItem("defaultQueries", JSON.stringify(defaultQueries));
-}
-}
-
-initLocalStorage();
+localStorage.setItem("defaultQueries", JSON.stringify(defaultQueries));
