@@ -1,10 +1,15 @@
 /**
- * Global variables.
+ * Web application to display and search Savannah bugs and patches.
  */
-var queryList;
 
+var queryList;  /// Unique instance of QueryWidgetList (Singleton Pattern).
 
+/**
+ * Things to do, once the page is loaded at the client.
+ */
 $(document).ready(function(){
+
+  // Instantiate Singleton list.
   queryList = new QueryWidgetList($("#queries")[0], $("#appImportExport")[0]);
 
   $("#quickSearchClearButton").click(function(event) {
@@ -22,7 +27,7 @@ $(document).ready(function(){
           //self.markFree();
           apiRequestHandleResult(this, params);
         }};
-      xhttp.open("GET", "api.php?" + query.getPermaLinkParams(), true);
+      xhttp.open("GET", "api.php?" + query.getQueryString(), true);
       xhttp.send();
       //self.markBusy();
     });
@@ -42,47 +47,99 @@ $(document).ready(function(){
       showPopup("warning", "Reset successful.");
     });
   $(".collapser").click(function(event) {
-      $(this).next().collapse("toggle");
+      this.next().collapse("toggle");
     });
-  $("#appImportExport")[0].addEventListener("change", adjustHeight);
-  $("#appImportExport")[0].addEventListener("focus",  adjustHeight);
-  $("#appImportExport")[0].addEventListener("keyup",  adjustHeight);
+  makeTextareaAdjustable($("#appImportExport")[0]);
 });
 
 
+/**
+ * Representation of a query.  It consists of:
+ *
+ * @param label string to identify the query
+ *
+ * @param url some url assiciated to the query
+ *
+ * @param api parameters to query SavannahAPI.  For example:
+ *              `Action=get&TrackerID=bugs` or very sloppy from user input
+ *              `  Action=get    TrackerID=bugs  `.
+ *              All input will be normalized to the first example form.
+ */
+class Query {
+  constructor(label, url, api) {
+    this.label  = label;
+    this.api    = api.trim().replaceAll(/\s+/g, "&");
+    this.url    = url;
+  }
+  static getDefault() {
+    var value = document.location.search.substring(1);
+    value = (value ? value : localStorage.getItem("defaultQuery"));
+    return new Query("New query", "", value);
+  }
+  getLabel()       { return this.label; }
+  getQueryString() { return this.api; }
+  getURL()         { return this.url; }
+  getPermaLink() {
+    return localStorage.getItem("apiURL") + '?' + this.getQueryString();
+  }
+}
+
+
+/**
+ * Class to control a list of `QueryWidget`s.
+ */
 class QueryWidgetList {
   constructor(rootNode, importExportNode) {
     this.items = [];
     this.rootNode         = rootNode;
     this.importExportNode = importExportNode;
 
-    var customQueries  = JSON.parse(localStorage.getItem("customQueries"));
-    var defaultQueries = JSON.parse(localStorage.getItem("defaultQueries"));
-    if (!customQueries || (customQueries.length == 0)) {
-      customQueries = defaultQueries;
+    var queries = JSON.parse(localStorage.getItem("customQueries"));
+    // If no custom queries are saved, load the default ones.
+    if (!queries || (queries.length == 0)) {
+      queries = JSON.parse(localStorage.getItem("defaultQueries"));
     }
-    customQueries.forEach(e => this.add(new Query(e.label, e.url, e.api, ''),
-                                        {silent: true, readonly: true,
-                                         save: false}));
+    // Create all saved queries in "readonly" mode without popup messages.
+    queries.forEach(q => this.add(new Query(q.label, q.url, q.api),
+                                  {silent: true, readonly: true, save: false}));
     this.save();
   }
 
+  /**
+   * Remove all custom queries from `localStorage` and restarts the web app.
+   *
+   * @param jsonString new custom queries to be saved in `localStorage`.
+   *                   If not given, the app will be reset to the default
+   *                   queries during the reconstruction.
+   */
   reset(jsonString = "") {
     var self = this;
     localStorage.removeItem("customQueries");
-    this.items.forEach(item => self.remove(item));
+    this.items.forEach(i => self.remove(i));
     if (jsonString) {
       localStorage.setItem("customQueries", jsonString);
     }
     queryList = new QueryWidgetList(this.rootNode, this.importExportNode);
   }
 
+  /**
+   * Save current state of the web app persistently to the `localStorage`.
+   */
   save() {
     var jsonString = this.getCustomQueriesJSON();
     localStorage.setItem("customQueries", jsonString);
     this.importExportNode.value = jsonString;
   }
 
+  /**
+   * Update graphical representation of @p item with @p newNode.
+   *
+   * @param item `QueryWidget` to be updated
+   *
+   * @param newNode new graphical representation (DOM `Node`) of @p item
+   *
+   * It is not necessary, that @p item had a graphical representation before.
+   */
   update(item, newNode) {
     var old = item.getNode();
     if (old) {
@@ -92,23 +149,43 @@ class QueryWidgetList {
     }
   }
 
+  /**
+   * Remove persistently @p item with graphical representation from the app.
+   *
+   * @param item `QueryWidget` to be removed from:
+   *               1. graphical representation
+   *               2. this list
+   *               3. `localStorage`
+   */
   remove(item) {
     this.rootNode.removeChild(item.getNode());
     this.items = this.items.filter(function(e){ return e!= item; });
     this.save();
   }
 
+  /**
+   * Returns the current state of the web app as JSON string.
+   *
+   * @return JSON string
+   */
   getCustomQueriesJSON() {
     var queries = [];
-    this.items.forEach(function (item) {
-        var q = item.getQuery();
-        delete q.result;
-        delete q.resultCount;
-        queries.push(q);
-      });
+    this.items.forEach(i => queries.push(i.getQuery()));
     return JSON.stringify(queries);
   }
 
+  /**
+   * Add a new query to the web app.
+   *
+   * @param query `Query` to be evaluated and added to the web app
+   *
+   * @param options object array with boolean fields
+   *                  `silent`  : if true, do not show any popups on success
+   *                  `readonly`: if true, the `QueryWidget` is started in
+   *                              readonly mode
+   *                  `save`: if true, save changes persistently to the
+   *                          `localStorage`
+   */
   add(query, options={silent: true, readonly: true, save: true}) {
     var widget = new QueryWidget(this, query, options);
         widget.send(options);
@@ -121,71 +198,15 @@ class QueryWidgetList {
 
 
 /**
- * Load locally stored items.
+ * Widget to display and modify `Queries`.
  */
-class Query {
-  constructor(label, url, apiParams, result) {
-    this.label  = label;
-    this.api    = apiParams.trim().replaceAll(/\s+/g, "&");
-    this.url    = url;
-    this.result = "";
-    this.resultCount = 0;
-    this.setResultHTML(result);
-  }
-  static getDefault() {
-    var value = document.location.search.substring(1);
-    value = (value ? value : localStorage.getItem("defaultQuery"));
-    return new Query('New query', '', value, '');
-  }
-  static getFromGETParams() {
-    return new Query('', '', localStorage.getItem("defaultQuery"), '');;
-  }
-  getLabel() {
-    return this.label;
-  }
-  getURL() {
-    return this.url;
-  }
-  getPermaLink() {
-    return localStorage.getItem("apiURL") + '?' + this.api;
-  }
-  getPermaLinkParams() {
-    return this.api;
-  }
-  setResultHTML(str) {
-    this.result = str;
-    this.resultCount = this.__getResultCount();
-  }
-  getResultHTML() {
-    return this.result;
-  }
-  getResultCount() {
-    return this.resultCount;
-  }
-  __getResultCount() {
-    if (!this.result) {
-      return 0;
-    }
-    if (this.result.substr(0, 6) === "<table") {
-      // ignore head line
-      return (this.result.match(/<tr/g) || []).length - 1;
-    } else {
-      try {
-        return JSON.parse(this.result).length;
-      } catch (e) {
-        // Must be CSV and count rows.  Ignore head line and last newline.
-        return this.result.split("\n").length - 2;
-      }
-    }
-  }
-}
-
-
 class QueryWidget {
   constructor(list, query, options) {
     this.list     = list;
-    this.query    = query;
     this.readonly = options.readonly;
+    this.query    = query;
+    this.result   = "";
+    this.resultCount = 0;
 
     // Sub-widgets that need access.
     this.url = null;
@@ -203,23 +224,40 @@ class QueryWidget {
   }
 
   setResultHTML(result) {
-    this.query.setResultHTML(result);
+    this.result = result;
+    this.resultCount = this.__getResultCount();
     this.repaint();
   }
 
   getNode() { return this.node };
 
   getQuery() {
-    return ((this.readonly)
-            ? this.query
-            : new Query(this.label.value, this.url.value,
-                        this.parameter.value, this.query.getResultHTML()));
+    return (this.readonly ? this.query : new Query(this.label.value,
+                                                   this.url.value,
+                                                   this.parameter.value));
+  }
+
+  __getResultCount() {
+    if (!this.result) {
+      return 0;
+    }
+    if (this.result.substr(0, 6) === "<table") {
+      // ignore head line
+      return (this.result.match(/<tr/g) || []).length - 1;
+    } else {
+      try {
+        return JSON.parse(this.result).length;
+      } catch (e) {
+        // Must be CSV and count rows.  Ignore head line and last newline.
+        return this.result.split("\n").length - 2;
+      }
+    }
   }
 
   repaint() {
     const self = this;
     var query  = this.query;
-    var params = query.getPermaLinkParams().replaceAll("&", "\n");
+    var params = query.getQueryString().replaceAll("&", "\n");
     var element = document.createElement(null);
     if (this.readonly) {
       var labelHTML = `
@@ -274,7 +312,7 @@ class QueryWidget {
                       aria-expanded="true">
                 &nbsp;<i class="fas fa-plus"></i>&nbsp;
                 <span class="badge badge-pill badge-light badge-light-mod">
-                  ${query.getResultCount()}
+                  ${this.resultCount}
                 </span>
               </button>
             </div>
@@ -303,60 +341,55 @@ class QueryWidget {
         <div class="card-body collapse">
           ${formHTML}
           <div class="overflow-auto">
-            ${query.getResultHTML()}
+            ${this.result}
           </div>
         </div>
       </div>
     </div>
     `;
     element = element.firstElementChild;
-    var buttons = element.getElementsByTagName("button");  // order given above
-    var toggleButton   = buttons[0];
-        toggleButton.addEventListener("click", function(event) {
-          $(this).closest("div.card").children("div.card-body").collapse("toggle");
-        });
+    var buttons = $(element).find("button");  // order given above
+    // toggle button
+    buttons[0].addEventListener("click", function(event) {
+        $(this).closest("div.card").children("div.card-body").collapse("toggle");
+      });
     this.refreshButton = buttons[1];
     this.refreshButton.addEventListener("click", function(event) {
         self.send();
       });
-    var editCancelButton = buttons[2];
-        editCancelButton.addEventListener("click", function(event) {
-            self.toggleReadOnly();
-          });
-    var copyButton = buttons[3];
-        copyButton.addEventListener("click",function(event) {
-            copyToClipboard(self.getQuery().getPermaLink())
-          });
+    // edit cancel button
+    buttons[2].addEventListener("click", function(event) {
+        self.toggleReadOnly();
+      });
+    // copy button
+    buttons[3].addEventListener("click",function(event) {
+        copyToClipboard(self.getQuery().getPermaLink())
+      });
 
     if (this.readonly) {
       this.label     = null;
       this.url       = null;
       this.parameter = null;
     } else {
-      var saveButton = buttons[4];
-          saveButton.addEventListener("click", function(event) {
-              self.query = self.getQuery();
-              self.list.save();
-              self.toggleReadOnly();
-            });
-      var deleteButton = buttons[5];
-          deleteButton.addEventListener("click", function(event) {
-              self.list.remove(self);
-            });
+      // save button
+      buttons[4].addEventListener("click", function(event) {
+          self.query = self.getQuery();
+          self.list.save();
+          self.toggleReadOnly();
+        });
+      // delete button
+      buttons[5].addEventListener("click", function(event) {
+          self.list.remove(self);
+        });
 
-      var inputs = element.getElementsByTagName("input");
-      this.label = inputs[0];
-      this.url   = inputs[1];
-      this.parameter = element.getElementsByTagName("textarea")[0];
-      this.parameter.addEventListener("change", adjustHeight);
-      this.parameter.addEventListener("focus",  adjustHeight);
-      this.parameter.addEventListener("keyup",  adjustHeight);
+      this.label     = $(element).find("input")[0];
+      this.url       = $(element).find("input")[1];
+      this.parameter = $(element).find("textarea")[0];
+      makeTextareaAdjustable(this.parameter);
     }
 
-    $(element).find("table").addClass("table");
-    $(element).find("table").addClass("table-borderless");
-    $(element).find("table").addClass("table-hover");
-    $(element).find("table").addClass("table-responsive");
+    $(element).find("table").addClass(
+      "table table-borderless table-hover table-responsive");
 
     // Copy state from previous node.
     if (this.node) {
@@ -390,32 +423,51 @@ class QueryWidget {
         params.queryForm = self;
         apiRequestHandleResult(this, params);
       }};
-    xhttp.open("GET", "api.php?" + query.getPermaLinkParams(), true);
+    xhttp.open("GET", "api.php?" + query.getQueryString(), true);
     xhttp.send();
     self.markBusy();
   }
 }
 
 
-function apiUpdateItem(node, tracker, id) {
+/**
+ * Convenience function to create an API call to update a single item.
+ *
+ * @param tracker TrackerID verified by the server
+ *
+ * @param id ItemID verified by the server
+ *
+ * @param node (optional) DOM `Node` whos link will be replace with a question
+ *                        mark.  Application specific parameter.
+ */
+function apiUpdateItem(tracker, id, node=null) {
+  var url   = "api.php?Action=update&TrackerID=" + tracker + "&ItemID=" + id;
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == XMLHttpRequest.DONE) {
       apiRequestHandleResult(this,
                              {message: "<b>" + tracker + " #" + id + "</b>"});
     }};
-  xhttp.open("GET", "api.php?Action=update&TrackerID=" + tracker
-                    + "&ItemID=" + id, true);
+  xhttp.open("GET", url, true);
   xhttp.send();
-  node.parentNode.innerHTML = '❓';
+  if (node) {
+    node.parentNode.innerHTML = '❓';
+  }
 }
 
 
+/**
+ * Handle the result of an API request.
+ *
+ * @param request result of an `XMLHttpRequest`
+ *
+ * @param params several application specific parameters
+ */
 function apiRequestHandleResult(request, params) {
   if (request.status == 200) {
     var answer = request.responseText;
     params = (params ? params : {});
-    /**
+    /*
      * The API server will answer with either a JSON string of the form:
      *
      *   {"state": ["success", "error", "warning", "info"], "message": string}
@@ -448,11 +500,15 @@ function apiRequestHandleResult(request, params) {
 
 
 /**
- * Global helper functions.
+ * Shows a popup.
+ *
+ * @param type one of {"info", "warning", "error", "success"}
+ *
+ * @param message string to be displayed
+ *
+ * @param delay in milliseconds
  */
-
-function showPopup(type, message) {
-  var delay = 10000;  // milliseconds
+function showPopup(type, message, delay=10000) {
   var headText = "Info";
   switch(type) {
     case "warning":
@@ -491,11 +547,26 @@ function showPopup(type, message) {
   setTimeout(function(){ element.remove(); }, delay);
 }
 
-function adjustHeight() {
-  this.style.height = "1px";
-  this.style.height = this.scrollHeight + "px";
+/**
+ * Make a `textarea` adjustable to the given content.
+ *
+ * @param node DOM `Node` of a `textarea`
+ */
+function makeTextareaAdjustable(node) {
+  var adjustHeight = function () {
+      this.style.height = "1px";
+      this.style.height = this.scrollHeight + "px";
+    };
+  node.addEventListener("change", adjustHeight);
+  node.addEventListener("focus",  adjustHeight);
+  node.addEventListener("keyup",  adjustHeight);
 }
 
+/**
+ * Copy a string to the clipboard and show popup when done.
+ *
+ * @param str string to be copied to the clipboard.
+ */
 function copyToClipboard(str) {
   var temp = $("<input>");
   $("body").append(temp);
