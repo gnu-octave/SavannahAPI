@@ -35,6 +35,7 @@ class api
     $apiActions['get']['OrderBy']      = $columnNames;
     array_push($columnNames, 'UpdateCallback');
     $apiActions['get']['Columns']      = $columnNames;
+    $apiActions['get']['Keywords']     = null;
 
     // Allow negations for inverted order.
     foreach ($apiActions['get']['OrderBy'] as $value) {

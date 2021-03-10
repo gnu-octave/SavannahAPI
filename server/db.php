@@ -99,7 +99,7 @@ class db
     $sqlWHERE   = array();
     $sqlLIMIT   = '';
     $sqlORDERBY = ['TrackerID ASC', 'ItemID DESC'];
-    $sqlDATA   = array();
+    $sqlDATA    = array();
     if ($filter !== null) {
       foreach ($filter as $key => $value) {
         $op = null;
@@ -146,6 +146,22 @@ class db
               $sqlDATA = array_merge($sqlDATA, [":$key$k" => $makeValid($v)]);
             }
             array_push($sqlWHERE, '(' . implode(" $conj ",  $sql) . ')');
+            break;
+          case 'Keywords':
+            $makeValid = function($v){ return "%$v%"; };
+            $sql         = array();
+            $sqlKeywords = array();
+            foreach ($value as $k => $v) {
+              array_push($sql,         "Title LIKE :$key$k");
+              array_push($sqlKeywords, "Text  LIKE :$key$k");
+              $sqlDATA = array_merge($sqlDATA, [":$key$k" => $makeValid($v)]);
+            }
+            $sqlKeywords =
+              'ID IN (SELECT DISTINCT(ItemID)
+                      FROM   Discussions
+                      WHERE  (' . implode(" OR ",  $sqlKeywords) . '))';
+            array_push($sql, $sqlKeywords);
+            array_push($sqlWHERE, '(' . implode(" OR ",  $sql) . ')');
             break;
           case 'Limit':
             $sqlLIMIT = ' LIMIT :Limit ';

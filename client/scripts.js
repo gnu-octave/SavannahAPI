@@ -263,7 +263,8 @@ class QuickSearchWidget {
     if (input.includes("Action=get") || input.includes("Action=update")) {
       var qstring = input;
     } else {
-      var qstring = 'Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=';
+      var qstring
+        = 'Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Keywords=';
       qstring += input.replaceAll(' ', '%20');
     }
     return new Query('', '', qstring, '');
