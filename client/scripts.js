@@ -9,32 +9,12 @@ var queryList;  /// Unique instance of QueryWidgetList (Singleton Pattern).
  */
 $(document).ready(function(){
 
-  // Instantiate Singleton list.
   queryList = new QueryWidgetList($("#queries")[0], $("#appImportExport")[0]);
 
-  $("#quickSearchClearButton").click(function(event) {
-      $("#quickSearchResult")[0].innerHTML = "";
-      $("#quickSearchInput")[0].value = "";
-    });
-  $("#quickSearchSubmitButton").click(function(event) {
-      var qstring = 'Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=';
-      qstring += $("#quickSearchInput")[0].value.trim().replaceAll(' ', '%20');
-      var query = new Query('', '', qstring, '');
-      var xhttp = new XMLHttpRequest();
-      var params = {queryQuick: $("#quickSearchResult")[0]};
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == XMLHttpRequest.DONE) {
-          //self.markFree();
-          apiRequestHandleResult(this, params);
-        }};
-      xhttp.open("GET", "api.php?" + query.getQueryString(), true);
-      xhttp.send();
-      //self.markBusy();
-    });
+  new QuickSearchWidget();
 
-  $("#newQueryButton").click(function(event) {
-      queryList.add(Query.getDefault());
-    });
+  // Initialize "Settings"
+  makeTextareaAdjustable($("#appImportExport")[0]);
   $("#settingsCopy").click(function(event) {
       copyToClipboard($("#appImportExport")[0].value);
     });
@@ -46,10 +26,7 @@ $(document).ready(function(){
       queryList.reset();
       showPopup("warning", "Reset successful.");
     });
-  $(".collapser").click(function(event) {
-      this.next().collapse("toggle");
-    });
-  makeTextareaAdjustable($("#appImportExport")[0]);
+
 });
 
 
@@ -86,6 +63,35 @@ class Query {
 
 
 /**
+ * Representation of a `Query` result.
+ */
+class QueryResult {
+  constructor(str = "") {
+    this.result = str;
+    this.count  = 0;
+    this.getCount();
+  }
+  getHTML() { return this.result }
+  getCount() {
+    if (this.result && (this.count <= 0)) {
+      if (this.result.substr(0, 6) === "<table") {
+        // ignore head line
+        this.count = (this.result.match(/<tr/g) || []).length - 1;
+      } else {
+        try {
+          this.count = JSON.parse(this.result).length;
+        } catch (e) {
+          // Must be CSV and count rows.  Ignore head line and last newline.
+          this.count = this.result.split("\n").length - 2;
+        }
+      }
+    }
+    return this.count;
+  }
+}
+
+
+/**
  * Class to control a list of `QueryWidget`s.
  */
 class QueryWidgetList {
@@ -103,6 +109,10 @@ class QueryWidgetList {
     queries.forEach(q => this.add(new Query(q.label, q.url, q.api),
                                   {silent: true, readonly: true, save: false}));
     this.save();
+
+    $("#newQueryButton").click(function(event) {
+        queryList.add(Query.getDefault());
+      });
   }
 
   /**
@@ -200,13 +210,96 @@ class QueryWidgetList {
 /**
  * Widget to display and modify `Queries`.
  */
+class QuickSearchWidget {
+  constructor() {
+    this.result = new QueryResult();
+    this.repaint();
+
+    var self = this;
+    $("#quickSearchClearButton").click(function(event) {
+        self.result = new QueryResult();
+        self.repaint();
+        $("#quickSearchInput")[0].value = "";
+      });
+    $("#quickSearchSubmitButton").click(function(event) {
+        self.send();
+      });
+    $("#quickSearchInput").keyup(function(event) {
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          $("#quickSearchSubmitButton").click();
+        }
+      });
+  }
+
+  setResultHTML(result) {
+    this.result = new QueryResult(result);
+    this.repaint();
+  }
+
+  repaint() {
+    $("#quickSearchResult")[0].innerHTML = this.result.getHTML();
+    $("#quickSearchSubmitButton")[0].innerHTML =
+      "Quick search (" + this.result.getCount() + ")";
+  }
+
+  markBusy() {
+    $("#quickSearchSubmitButton").disabled = true;
+    $("#quickSearchSubmitButton")[0].innerHTML =
+      `Quick search  <i class="fas fa-sync fa-spin"></i>`;
+  }
+
+  markFree() {
+    $("#quickSearchSubmitButton").disabled = false;
+    this.repaint();
+  }
+
+  prepareQuery() {
+    var input = $("#quickSearchInput")[0].value.trim();
+    if (input.length < 3) {
+      return false;
+    }
+    // Check if input contains API parameter no extra processing.
+    if (input.includes("Action=get") || input.includes("Action=update")) {
+      var qstring = input;
+    } else {
+      var qstring = 'Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=';
+      qstring += input.replaceAll(' ', '%20');
+    }
+    return new Query('', '', qstring, '');
+  }
+
+  send(params) {
+    params = (params ? params : {});
+    const self = this;
+    var query = this.prepareQuery();
+    if (query === false) {
+      showPopup("warning", "Search string must have at least 3 characters.");
+      return;
+    }
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == XMLHttpRequest.DONE) {
+        self.markFree();
+        params.widget = self;
+        apiRequestHandleResult(this, params);
+      }};
+    xhttp.open("GET", "api.php?" + query.getQueryString(), true);
+    xhttp.send();
+    self.markBusy();
+  }
+}
+
+
+/**
+ * Widget to display and modify `Queries`.
+ */
 class QueryWidget {
   constructor(list, query, options) {
     this.list     = list;
     this.readonly = options.readonly;
     this.query    = query;
-    this.result   = "";
-    this.resultCount = 0;
+    this.result   = new QueryResult();
 
     // Sub-widgets that need access.
     this.url = null;
@@ -224,8 +317,7 @@ class QueryWidget {
   }
 
   setResultHTML(result) {
-    this.result = result;
-    this.resultCount = this.__getResultCount();
+    this.result = new QueryResult(result);
     this.repaint();
   }
 
@@ -235,23 +327,6 @@ class QueryWidget {
     return (this.readonly ? this.query : new Query(this.label.value,
                                                    this.url.value,
                                                    this.parameter.value));
-  }
-
-  __getResultCount() {
-    if (!this.result) {
-      return 0;
-    }
-    if (this.result.substr(0, 6) === "<table") {
-      // ignore head line
-      return (this.result.match(/<tr/g) || []).length - 1;
-    } else {
-      try {
-        return JSON.parse(this.result).length;
-      } catch (e) {
-        // Must be CSV and count rows.  Ignore head line and last newline.
-        return this.result.split("\n").length - 2;
-      }
-    }
   }
 
   repaint() {
@@ -312,7 +387,7 @@ class QueryWidget {
                       aria-expanded="true">
                 &nbsp;<i class="fas fa-plus"></i>&nbsp;
                 <span class="badge badge-pill badge-light badge-light-mod">
-                  ${this.resultCount}
+                  ${this.result.getCount()}
                 </span>
               </button>
             </div>
@@ -341,7 +416,7 @@ class QueryWidget {
         <div class="card-body collapse">
           ${formHTML}
           <div class="overflow-auto">
-            ${this.result}
+            ${this.result.getHTML()}
           </div>
         </div>
       </div>
@@ -420,7 +495,7 @@ class QueryWidget {
     xhttp.onreadystatechange = function() {
       if (this.readyState == XMLHttpRequest.DONE) {
         self.markFree();
-        params.queryForm = self;
+        params.widget = self;
         apiRequestHandleResult(this, params);
       }};
     xhttp.open("GET", "api.php?" + query.getQueryString(), true);
@@ -482,14 +557,11 @@ function apiRequestHandleResult(request, params) {
     if (answer.state) {
       showPopup(answer.state, (params.message ? params.message + ' ' : '')
                               + answer.message);
-    } else if (params.queryForm) {
-      params.queryForm.setResultHTML(request.responseText);
+    } else if (params.widget) {
+      params.widget.setResultHTML(request.responseText);
       if (!params.silent) {
         showPopup("success", "");
       }
-    } else if (params.queryQuick) {
-      params.queryQuick.innerHTML = request.responseText;
-      showPopup("success", "");
     } else {
       showPopup("warning", "Unknown server response: " + request.responseText);
     }
