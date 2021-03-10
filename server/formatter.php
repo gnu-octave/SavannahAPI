@@ -49,7 +49,7 @@ class formatter
   private function reduceColumns($item)
   {
     $new_item = array();
-    foreach (array_merge(['refresh'], $this->columns) as $key) {
+    foreach ($this->columns as $key) {
       if (array_key_exists($key, $item)) {
         $new_item[$key] = $item[$key];
       }
@@ -124,12 +124,12 @@ class formatter
   private function addURLs($item)
   {
     $id  = $item['ItemID'];
-    $refreshLink = "<a onclick=\"apiUpdateItem(this, '"
+    $refreshLink = "<a onclick=\"updateCallback(this, '"
                    . $item['TrackerID'] . "', '$id')\" href=\"#\">🔄</a>";
     $url = CONFIG::BASE_URL . '/' . $item['TrackerID'] . "/index.php?$id";
     $item['ItemID'] = "<a href=\"$url\">$id</a>";
     $item['Title']  = "<a href=\"$url\">" . $item['Title'] . "</a>";
-    $item = array_merge(['refresh' => $refreshLink], $item);
+    $item = array_merge(['UpdateCallback' => $refreshLink], $item);
     return $item;
   }
 
@@ -145,10 +145,10 @@ class formatter
    */
   public function asHTML($columns, $color = false)
   {
+    $columns[array_search('UpdateCallback', $columns)] = '';
     $css = ($color) ? ' style="background-color: powderblue; padding: 5px;"'
                     : '';
-    $thead = '<tr>' . (($color) ? "<th$css>&nbsp;</th>" : '')
-             . "<th$css>" . implode("</th><th$css>", $columns) . '</th></tr>';
+    $thead = "<tr><th$css>" . implode("</th><th$css>", $columns) . '</th></tr>';
     $thead = "<thead>$thead</thead>";
     $tbody = '';
     foreach ($this->items as $item) {

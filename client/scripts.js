@@ -506,16 +506,17 @@ class QueryWidget {
 
 
 /**
- * Convenience function to create an API call to update a single item.
+ * API callback function to update a single item.
+ *
+ * @param node (optional) DOM `Node` whos link will be replace with a question
+ *                        mark.  Application specific parameter.
  *
  * @param tracker TrackerID verified by the server
  *
  * @param id ItemID verified by the server
  *
- * @param node (optional) DOM `Node` whos link will be replace with a question
- *                        mark.  Application specific parameter.
  */
-function apiUpdateItem(tracker, id, node=null) {
+function updateCallback(node=null, tracker, id) {
   var url   = "api.php?Action=update&TrackerID=" + tracker + "&ItemID=" + id;
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {

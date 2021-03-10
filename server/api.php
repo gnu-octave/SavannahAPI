@@ -31,9 +31,11 @@ class api
       $apiActions['get']["$key!"] = $value;
     }
     $apiActions['get']['Format']       = $this->formats;
-    $apiActions['get']['Columns']      = $columnNames;
     $apiActions['get']['Limit']        = null;
     $apiActions['get']['OrderBy']      = $columnNames;
+    array_push($columnNames, 'UpdateCallback');
+    $apiActions['get']['Columns']      = $columnNames;
+
     // Allow negations for inverted order.
     foreach ($apiActions['get']['OrderBy'] as $value) {
       array_push($apiActions['get']['OrderBy'], "!$value");
@@ -194,7 +196,7 @@ class api
           if (!in_array($value, $validParameters[$key])) {
             return "Unknown parameter value for '$key'.
                     Valid parameter keys are:
-                    {" . implode(',', $validParameters[$key]) . "}.";
+                    {" . implode(', ', $validParameters[$key]) . "}.";
           }
         }
       }
