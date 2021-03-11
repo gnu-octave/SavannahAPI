@@ -30,7 +30,23 @@
 <div aria-live="polite" aria-atomic="true" style="position: relative;">
   <div id="toasts" style="z-index: 5; position: absolute; top: 0; right: 0;"></div>
   <div id="queries" class="container-xl">
-    <h1 class="my-3 p-2">GNU Octave - Savannah Bugs and Patches</h1>
+    <div class="d-flex justify-content-center mt-3 p-2">
+      <h1>GNU Octave - Savannah Bugs and Patches</h1>
+    </div>
+    <div class="d-flex justify-content-center mb-3">
+      <a href="https://savannah.gnu.org/bugs/?group=octave">
+        <i class="fas fa-home"></i> Savannah
+        <span class="d-none d-sm-inline">project page</span>
+      </a>
+      &nbsp;&nbsp;&nbsp;
+      <a href="https://savannah.gnu.org/bugs/?group=octave&func=additem">
+        <i class="fas fa-bug"></i> New bug
+      </a>
+      &nbsp;&nbsp;&nbsp;
+      <a href="https://savannah.gnu.org/patch/?group=octave&func=additem">
+        <i class="fas fa-file-upload"></i> New patch
+      </a>
+    </div>
     <noscript>JavaScript must be enabled to run this tool.</noscript>
     <div class="m-1">
       <div class="form-group input-group">
@@ -95,6 +111,9 @@
 
 <div id="footer" class="d-flex justify-content-center my-4">
   <p>
+    Download the
+    <a href="server/savannah.cache.sqlite">SQLite database</a> (~70 MB).
+    &nbsp;
     Get the source code on
     <a href="https://github.com/gnu-octave/SavannahAPI">GitHub</a>.
   </p>

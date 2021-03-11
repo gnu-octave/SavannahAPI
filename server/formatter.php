@@ -145,7 +145,9 @@ class formatter
    */
   public function asHTML($columns, $color = false)
   {
-    $columns[array_search('UpdateCallback', $columns)] = '';
+    if (($key = array_search('UpdateCallback', $columns)) !== false) {
+      $columns[$key] = '';
+    }
     $css = ($color) ? ' style="background-color: powderblue; padding: 5px;"'
                     : '';
     $thead = "<tr><th$css>" . implode("</th><th$css>", $columns) . '</th></tr>';

@@ -232,9 +232,19 @@ class api
     $time_end   = microtime(true);
     $time = substr($time_end - $time_start, 0, 6);
     DEBUG_LOG("Found " . count($items) . " item(s) in $time seconds.");
-    $columns = (array_key_exists('Columns', $request))
-             ? $request['Columns']
-             : array_column(array_values(CONFIG::ITEM_DATA), 0);
+    if (array_key_exists('Columns', $request)) {
+      $columns = $request['Columns'];
+    } else {
+      // Default columns.
+      $columns = array_column(array_values(CONFIG::ITEM_DATA), 0);
+      // Do not show some uninteresting fields by default.
+      unset($columns[array_search('SubmittedBy',    $columns)]);
+      unset($columns[array_search('OriginatorName', $columns)]);
+      // Show UpdateCallback by default in HTMLCSS mode.
+      if ($request['Format'] === 'HTMLCSS') {
+        array_unshift($columns , 'UpdateCallback');
+      }
+    }
     $fmt = new formatter($items, $columns);
     if (!array_key_exists('Format', $request)) {
       return $fmt->asJSON();
