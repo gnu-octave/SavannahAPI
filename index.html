@@ -37,7 +37,11 @@
         <div class="input-group-prepend">
           <button type="button" id="quickSearchSubmitButton"
                   class="btn btn-lg btn-info">
-            Quick search
+            <i class="fas fa-search"></i>
+            <span class="d-none d-sm-inline">
+              &nbsp;Search&nbsp;
+            </span>
+            <span id="quickSearchCount">(0)</span>
           </button>
         </div>
         <input type="text" id="quickSearchInput"
@@ -45,7 +49,8 @@
         <div class="input-group-append">
           <button type="button" id="quickSearchClearButton"
                   class="btn btn-lg btn-secondary">
-            Clear
+            <span class="d-none d-sm-inline">Clear</span>
+            <span class="d-inline d-sm-none"><i class="fas fa-ban"></i></span>
           </button>
         </div>
       </div>

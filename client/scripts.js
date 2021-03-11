@@ -239,14 +239,12 @@ class QuickSearchWidget {
 
   repaint() {
     $("#quickSearchResult")[0].innerHTML = this.result.getHTML();
-    $("#quickSearchSubmitButton")[0].innerHTML =
-      "Quick search (" + this.result.getCount() + ")";
+    $("#quickSearchCount")[0].innerHTML = "(" + this.result.getCount() + ")";
   }
 
   markBusy() {
     $("#quickSearchSubmitButton").disabled = true;
-    $("#quickSearchSubmitButton")[0].innerHTML =
-      `Quick search  <i class="fas fa-sync fa-spin"></i>`;
+    $("#quickSearchCount")[0].innerHTML = `<i class="fas fa-sync fa-spin"></i>`;
   }
 
   markFree() {
@@ -333,7 +331,9 @@ class QueryWidget {
   repaint() {
     const self = this;
     var query  = this.query;
-    var params = query.getQueryString().replaceAll("&", "\n");
+    var params = this.parameter
+               ? this.parameter.value
+               : this.query.getQueryString().replaceAll("&", "\n");
     var element = document.createElement(null);
     if (this.readonly) {
       var labelHTML = `
@@ -348,8 +348,8 @@ class QueryWidget {
       var buttonsHTML = "";
       var formHTML = "";
     } else {
-      var labelHTML = `
-        <input type="text" class="form-control" value="${query.getLabel()}">`;
+      var labelHTML = `<input type="text" class="form-control"
+            value="${this.label ? this.label.value : query.getLabel()}">`;
       var buttonsEditClass = "warning";
       var buttonsEditIcon  = "fas fa-ban";
       var buttonsHTML = `
@@ -366,7 +366,8 @@ class QueryWidget {
         <div class="input-group-prepend">
           <div class="input-group-text">url</div>
         </div>
-        <input type="url" value="${query.getURL()}" class="form-control">
+        <input type="url" class="form-control"
+               value="${this.url ? this.url.value : query.getURL()}">
       </div>
       <div class="form-group input-group">
         <div class="input-group-prepend">
