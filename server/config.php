@@ -83,12 +83,13 @@ class CONFIG
   const ITEM_STATE = ['closed', 'open'];
 }
 
-function DEBUG_LOG($str)
-{
-  /* Uncomment for debugging.
-  echo("$str<br>");
-  ob_flush();
-  flush();*/
+if (!function_exists('DEBUG_LOG')) {
+  function DEBUG_LOG($str) {
+    /* Uncomment for debugging.
+    echo("$str<br>");
+    ob_flush();
+    flush();*/
+  }
 }
 
 ?>
