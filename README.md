@@ -1,23 +1,91 @@
 # SavannahAPI
 
-Systematic overview about GNU Octave bugs at
-<https://savannah.gnu.org/bugs/?group=octave>.
-
-This is a helper web application to query the GNU Octave bug and patch tracker
-at GNU Savannah for particular bugs of interest, such as having a high severity,
-etc.
-
-One instance of this web application is hosted at
+A more systematic overview about bugs and patches
 
 > <https://octave.space/savannah/>
 
-## Sophisticated API
 
-As a byproduct of this effort the internal SQLite database conveniently via a
-web API.  For example the following statement delivers the first 20 open bugs
-in JSON format:
+## Usage
 
-> <https://octave.space/savannah/api.php?Action=get&Format=JSON&OpenClosed=open&OrderBy=TrackerID,!ItemID&Limit=20>
+### Top search bar
+
+Works as any other usual search bar:
+enter keywords, hit enter, or press the left search button.
+The right clear button clear all fields.
+
+If the input are simple keywords all items (bugs and patches) Title and
+Discussion text will be searched.
+
+- **white space** separated words are treated as a single search term.
+  For example, `"krylov subspace"` will look for titles and discussions
+  containing both words in this order.  The search result is likely different
+  from `"subspace krylov"`.
+
+- **white space matters:** `"krylov subspace"` and `"krylov  subspace"`
+  (with two spaces) are different search terms.
+
+- **commas** are treated as "OR-searches".
+  For example, `"krylov,subspace"` and `"subspace,krylov"` both have the same
+  search result.  Titles and discussions containing either "krylov" or
+  "subspace" or both terms will be found.
+
+The top search bar also accepts API parameter inputs,
+which are explained in the next section.
+
+
+### Advanced API searches
+
+To be explained...
+
+
+### The API syntax and grammar
+
+Explanation:
+- `[string]`: string with white space, e.g. `"krylov  subspace"`
+- `[strings]`: `[string],[string],...`, e.g. `"krylov,subspace"`
+- `[int]`: non-negative integer, e.g. `1`, `42`, `12345`, ...
+- `[int]`: `[int],[int],...`, e.g. `42,12345`
+- `{A|B|...}`: exactly one, e.g., `A`, `B`, ...
+- `{A,B,...}`: combination, e.g., `A`, `B`, `A,B`, `B,A`, ...
+- `[IGNORED]`: value ignored (reserved keyword)
+
+```
+Action=get
+
+    Keywords=[strings]
+    Title=[strings]
+    Category=[strings]
+    Severity=[strings]
+    Priority=[strings]
+    ItemGroup=[strings]
+    Status=[strings]
+    AssignedTo=[strings]
+    Release=[strings]
+    OperatingSystem=[strings]
+    Limit=[int]
+    ItemID=[ints]
+    TrackerID={bugs,patch}
+    OpenClosed={open,closed}
+    Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}
+    Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,
+             Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,
+             Release,OperatingSystem,SubmittedBy,OriginatorName,
+             UpdateCallback}
+    LastComment=[IGNORED]
+    SubmittedOn=[IGNORED]
+
+
+Action=update
+
+    TrackerID={bugs,patch}
+    ItemID=[ints]
+```
+
+
+### Saving queries in the local web browser
+
+To be explained...
+
 
 ## Development and deployment
 

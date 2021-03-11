@@ -169,7 +169,10 @@ class api
         case 'Format':
         case 'Limit':
           if (count($values) !== 1) {
-            return "Parameter keys '$key' allows only exact one value.";
+            return "Parameter key '$key' allows only exact one value.";
+          }
+          if (($key == 'Limit') && (intval($values[0]) <= 0)) {
+            return "Parameter key '$key' must be a positive integer.";
           }
           $validRequest[$key] = $values[0];
           break;
