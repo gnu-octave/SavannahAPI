@@ -47,42 +47,6 @@ class api
     $this->apiActions = $apiActions;
   }
 
-  /**
-   * Process a short API request.
-   *
-   * @param requestStringUnfiltered a string like `12345` or `bug12345`.
-   *
-   * @returns a string containing the result of the web request.
-   *          Error messages are JSON encoded with the fields:
-   *          "state"  : one of "success", "error", "warning", "info"
-   *          "message": string with information
-   */
-  public function processShortRequest($requestStringUnfiltered)
-  {
-    if (count($requestStringUnfiltered) !== 1) {
-      return $this->JSON("error", "Invalid request.  Try 'bug12345'.");
-    }
-    $req = array_key_first($requestStringUnfiltered);
-    // Wild guessing.
-    if (substr($req, 0, 4) === 'bugs') {
-      $request["TrackerID"] = "bugs";
-      $req = substr($req, 4);
-    } elseif (substr($req, 0, 3) === 'bug') {
-      $request["TrackerID"] = "bugs";
-      $req = substr($req, 3);
-    } elseif (substr($req, 0, 5) === 'patch') {
-      $request["TrackerID"] = "patch";
-      $req = substr($req, 5);
-    }
-    $request["ItemID"] = intval($req);
-    if ($request["ItemID"] === 0) {
-      return $this->JSON("error", "Invalid request.  Try 'bug12345'.");
-    }
-    $request["Action"] = "get";
-    $request["Format"] = "LINK";
-    return $this->processRequest($request);
-  }
-
 
   /**
    * Process an API request.
@@ -261,9 +225,6 @@ class api
         break;
       case 'CSV':
         return $fmt->asCSV();
-        break;
-      case 'LINK':
-        return $fmt->asLINK();
         break;
       default:
         die(JSON("error",

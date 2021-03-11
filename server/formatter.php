@@ -208,54 +208,5 @@ class formatter
     return $str;
   }
 
-  /**
-   * Get a rich LINK representation of a single item (without discussion).
-   *
-   * @param items list of associative arrays with fields given in the
-   *              "database column" of `CONST::ITEM_DATA`.
-   *
-   * @returns item as rich LINK string.
-   */
-  public function asLINK()
-  {
-    if (count($this->items) !== 1) {
-      return $this->JSON("error", "More than one item match the query.");
-    }
-    $item = $this->idsToString($this->items[0]);
-    $url  = 'https://savannah.gnu.org/' . $item['TrackerID'] . '/?'
-                                        . $item['ItemID'];
-    $logo = 'https://www.octave.org/img/octave-logo.png';
-    $title = '[' . $item['OpenClosed'] . '] '
-      . ($item['TrackerID'] === 'bugs' ? 'Bug' : 'Patch')
-      . ' #' . $item['ItemID'];
-    $group = CONFIG::GROUP['name'];
-
-    $str = '
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <title>' . $group . ' - ' . $title . ', ' . $item['Title'] . '</title>
-        <!-- Facebook Open Graph -->
-        <meta property="og:description" content="' . $item['Title'] . '">
-        <meta property="og:site_name"   content="' . $group . '">
-        <meta property="og:title" content="' . $title . '">
-        <meta property="og:url"   content="' . $url . '">
-        <meta property="og:type"  content="article">
-        <meta property="og:image" content="' . $logo . '">
-        <!-- Twitter -->
-        <meta name="twitter:card"  content="summary">
-        <meta name="twitter:title" content="' . $title . '">
-        <meta name="twitter:description" content="' . $item['Title'] . '">
-        <meta name="twitter:url"   content="' . $url . '">
-        <meta name="twitter:image" content="' . $logo . '">
-        <meta http-equiv="refresh" content="0; url=' . $url . '">
-      </head>
-      <body>
-        <a href="' . $url . '">' . $url . '</a>
-      </body>
-    </html>';
-
-    return $str;
-  }
 }
 ?>
