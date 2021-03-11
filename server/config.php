@@ -13,9 +13,13 @@ class CONFIG
   const DELAY       = ['crawlItem'         =>      1,   // Seconds delay
                        'crawlNewItems'     => 1 * 60,   // Seconds delay
                        'crawlUpdatedItems' => 1 * 60];  // Seconds delay
-  const MAX_CRAWL_ITEMS = 50; // Maximal number of items updates per request.
-                              // Automatic item updates are not affected
-                              // by this setting.
+  const MAX_CRAWL_ITEMS = 50;  // Maximal number of items updates per request.
+                               // Automatic item updates are not affected
+                               // by this setting.
+  const MAX_JSON_FULL_EXPORT = 50; // Maximal number of items that are allowed
+                                   // to be exported in JSON format with
+                                   // metadata and full discussion.
+                                   // VERY EXPENSIVE QUERY!
 
   /**
    * There are seemingly no standard mail archives for Savannah.

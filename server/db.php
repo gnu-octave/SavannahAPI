@@ -207,6 +207,42 @@ class db
 
 
   /**
+   * Retrieve all discussions to a single item.
+   *
+   * @param trackerID see index value of `CONST::TRACKER`.
+   *
+   * @param itemID non-negative integer.
+   *
+   * @returns an array of discussions.
+   */
+  public function getDiscussion($trackerID, $itemID) {
+    $data = array();  // return value
+
+    $command = 'SELECT ID
+                FROM   Items
+                WHERE TrackerID=:TrackerID
+                  AND    ItemID=:ItemID';
+    $stmt = $this->pdo->prepare($command);
+    $stmt->execute([':TrackerID' => $trackerID,
+                    ':ItemID'    => $itemID]);
+    $id = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($id === false) {
+      return $data;
+    }
+    $command = 'SELECT   Date, Author, Text
+                FROM     Discussions
+                WHERE    ItemID=:ItemID
+                ORDER BY Date ASC';
+    $stmt = $this->pdo->prepare($command);
+    $stmt->execute([':ItemID' => $id['ID']]);
+    while ($item = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      array_push($data, $item);
+    }
+    return $data;
+  }
+
+
+  /**
    * Get maximal item ID from a tracker.
    *
    * @param trackerID see index value of `CONST::TRACKER`.
@@ -216,8 +252,8 @@ class db
   public function getMaxItemIDFromTracker(int $trackerID)
   {
     $command = 'SELECT MAX(ItemID) AS ItemID
-                                   FROM  Items
-                                   WHERE TrackerID=:TrackerID';
+                FROM  Items
+                WHERE TrackerID=:TrackerID';
     $stmt = $this->pdo->prepare($command);
     $stmt->execute([':TrackerID' => $trackerID]);
     $id = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -236,8 +272,8 @@ class db
   public function getMaxLastCommentFromTracker(int $trackerID)
   {
     $command = 'SELECT MAX(LastComment) AS ItemID
-                                        FROM  Items
-                                        WHERE TrackerID=:TrackerID';
+                FROM  Items
+                WHERE TrackerID=:TrackerID';
     $stmt = $this->pdo->prepare($command);
     $stmt->execute([':TrackerID' => $trackerID]);
     $id = $stmt->fetch(PDO::FETCH_ASSOC);

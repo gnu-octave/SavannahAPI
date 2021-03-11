@@ -54,6 +54,9 @@ class formatter
         $new_item[$key] = $item[$key];
       }
     }
+    if (array_key_exists('Discussion', $item)) {
+      $new_item['Discussion'] = $item['Discussion'];
+    }
     return $new_item;
   }
 

@@ -11,7 +11,7 @@ class api
    * Valid keys and data types for API action requests.
    */
   private $apiActions = null;
-  private $formats = ['HTML', 'HTMLCSS', 'JSON', 'CSV', 'LINK'];
+  private $formats = ['HTML', 'HTMLCSS', 'JSON', 'JSONFULL', 'CSV'];
 
   /**
    * Constructor.
@@ -192,7 +192,21 @@ class api
   private function actionGet($request)
   {
     $time_start = microtime(true);
-    $items = DB::getInstance()->getItems($request);
+    $db = DB::getInstance();
+    $items = $db->getItems($request);
+    if ($request['Format'] === 'JSONFULL') {
+      if (count($items) > CONFIG::MAX_JSON_FULL_EXPORT) {
+        die($this->JSON("error",
+            "More than <b>" . CONFIG::MAX_JSON_FULL_EXPORT . "</b> items found."
+            . "  Please narrow your request or consider downloading the"
+            . "  entire SQLite database for advanced processing."));
+      }
+      foreach ($items as &$item) {
+        $item['Discussion'] = $db->getDiscussion($item['TrackerID'],
+                                                 $item['ItemID']);
+      }
+      unset($item);  // see PHP manual foreach!
+    }
     $time_end   = microtime(true);
     $time = substr($time_end - $time_start, 0, 6);
     DEBUG_LOG("Found " . count($items) . " item(s) in $time seconds.");
@@ -201,11 +215,11 @@ class api
     } else {
       // Default columns.
       $columns = array_column(array_values(CONFIG::ITEM_DATA), 0);
-      // Do not show some uninteresting fields by default.
-      unset($columns[array_search('SubmittedBy',    $columns)]);
-      unset($columns[array_search('OriginatorName', $columns)]);
-      // Show UpdateCallback by default in HTMLCSS mode.
       if ($request['Format'] === 'HTMLCSS') {
+        // Do not show some uninteresting fields.
+        unset($columns[array_search('SubmittedBy',    $columns)]);
+        unset($columns[array_search('OriginatorName', $columns)]);
+        // Show UpdateCallback.
         array_unshift($columns , 'UpdateCallback');
       }
     }
@@ -221,14 +235,15 @@ class api
         return $fmt->asHTML($columns);
         break;
       case 'JSON':
+      case 'JSONFULL':
         return $fmt->asJSON();
         break;
       case 'CSV':
         return $fmt->asCSV();
         break;
       default:
-        die(JSON("error",
-                 "Invalid format, use 'HTML', 'HTMLCSS', 'JSON', 'CSV'"));
+        die($this->JSON("error", "Invalid format, use one of '"
+                        . implode("', '", $validParameters[$key]) . "'."));
         break;
     }
   }
