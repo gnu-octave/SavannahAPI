@@ -207,6 +207,44 @@ class QueryWidgetList {
       this.save();
     }
   }
+
+  /**
+   * Get the index of an @p item in the list stored by this class.
+   *
+   * @param item `QueryWidget` to get the index from
+   *
+   * @return an index.
+   */
+  getIndexOf(item) {
+    return this.items.indexOf(item);
+  }
+
+  /**
+   * Swap two list elements persistently given their indices.
+   *
+   * This function stores the new order persistently and swaps the graphical
+   * Node representation.
+   *
+   * @param indexA and index value
+   *
+   * @param indexB and index value
+   */
+  swap(indexA, indexB) {
+    if (indexA != indexB) {
+      // Data structure swap.
+      var tmp = this.items[indexA];
+      this.items[indexA] = this.items[indexB];
+      this.items[indexB] = tmp;
+      this.save();
+      // Node swap.
+      var nodeA = this.items[indexA].getNode();
+      var nodeB = this.items[indexB].getNode();
+      const siblingA = (nodeA.nextSibling === nodeB) ? nodeA
+                                                     : nodeA.nextSibling;
+      this.rootNode.insertBefore(nodeA, nodeB);
+      this.rootNode.insertBefore(nodeB, siblingA);
+    }
+  }
 }
 
 
@@ -387,6 +425,7 @@ class QueryWidget {
         <div class="card-header card-header-mod">
           <div class="row">
             <div class="col-3 col-md-2 col-lg-2">
+              <i class="fas fa-sort dragAndDropIcon"></i>&nbsp;
               <button type="button"
                       class="btn btn-info button-width-mod text-left"
                       data-toggle="collapse"
@@ -470,6 +509,19 @@ class QueryWidget {
       makeTextareaAdjustable(this.parameter);
     }
 
+    // Drag & drop functionality.
+    $(element).find("i.dragAndDropIcon")[0].draggable = true;
+    $(element).find("i.dragAndDropIcon")[0].addEventListener("dragstart",
+      function(event) {
+        self.drag(event);
+      });
+    $(element)[0].addEventListener("drop", function(event) {
+        self.drop(event);
+      });
+    $(element)[0].addEventListener("dragover", function(event) {
+        self.allowDrop(event);
+      });
+
     $(element).find("table").addClass(
       "table table-borderless table-hover table-responsive");
 
@@ -492,6 +544,20 @@ class QueryWidget {
   markFree() {
     $(this.refreshButton).disabled = false;
     $(this.refreshButton).children('i')[0].classList.toggle("fa-spin");
+  }
+
+  drag(event) {
+    event.dataTransfer.setData("index", this.list.getIndexOf(this));
+  }
+
+  drop(event) {
+    event.preventDefault();
+    this.list.swap(event.dataTransfer.getData("index"),
+                   this.list.getIndexOf(this));
+  }
+
+  allowDrop(event) {
+    event.preventDefault();
   }
 
   send(params) {
