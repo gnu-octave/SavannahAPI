@@ -125,7 +125,12 @@ class QueryWidgetList {
     localStorage.removeItem("customQueries");
     this.items.forEach(i => self.remove(i));
     if (jsonString) {
-      localStorage.setItem("customQueries", jsonString);
+      if (jsonString === "forge") {
+        localStorage.setItem("customQueries",
+                             localStorage.getItem("forgeQueries"));
+      } else {
+        localStorage.setItem("customQueries", jsonString);
+      }
     }
     queryList = new QueryWidgetList(this.rootNode, this.importExportNode);
   }
