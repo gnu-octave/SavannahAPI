@@ -425,7 +425,9 @@ class QueryWidget {
         <div class="card-header card-header-mod">
           <div class="row">
             <div class="col-3 col-md-2 col-lg-2">
-              <i class="fas fa-sort dragAndDropIcon"></i>&nbsp;
+              <span class="d-none d-sm-inline">
+                <i class="fas fa-sort dragAndDropIcon"></i>&nbsp;
+              </span>
               <button type="button"
                       class="btn btn-info button-width-mod text-left"
                       data-toggle="collapse"
