@@ -11,7 +11,7 @@ $(document).ready(function(){
 
   queryList = new QueryWidgetList($("#queries")[0], $("#appImportExport")[0]);
 
-  new QuickSearchWidget();
+  new QuickSearchWidget(document.location.search.substring(1));
 
   // Initialize "Settings"
   makeTextareaAdjustable($("#appImportExport")[0]);
@@ -49,9 +49,7 @@ class Query {
     this.url    = url;
   }
   static getDefault() {
-    var value = document.location.search.substring(1);
-    value = (value ? value : localStorage.getItem("defaultQuery"));
-    return new Query("New query", "", value);
+    return new Query("New query", "", localStorage.getItem("defaultQuery"));
   }
   getLabel()       { return this.label; }
   getQueryString() { return this.api; }
@@ -211,9 +209,11 @@ class QueryWidgetList {
  * Widget to display and modify `Queries`.
  */
 class QuickSearchWidget {
-  constructor() {
+  constructor(url_get_params) {
     this.result = new QueryResult();
     this.repaint();
+
+    $("#quickSearchInput")[0].value = url_get_params;
 
     var self = this;
     $("#quickSearchClearButton").click(function(event) {
