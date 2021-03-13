@@ -11,7 +11,7 @@ A more systematic overview about bugs and patches
 
 Works as any other usual search bar:
 enter keywords, hit enter, or press the left search button.
-The right clear button clear all fields.
+The right clear button clears all fields.
 
 If the input are simple keywords all items (bugs and patches) Title and
 Discussion text will be searched.
@@ -44,7 +44,7 @@ Explanation:
 - `[string]`: string with white space, e.g. `"krylov  subspace"`
 - `[strings]`: `[string],[string],...`, e.g. `"krylov,subspace"`
 - `[int]`: non-negative integer, e.g. `1`, `42`, `12345`, ...
-- `[int]`: `[int],[int],...`, e.g. `42,12345`
+- `[ints]`: `[int],[int],...`, e.g. `42,12345`
 - `{A|B|...}`: exactly one, e.g., `A`, `B`, ...
 - `{A,B,...}`: combination, e.g., `A`, `B`, `A,B`, `B,A`, ...
 - `[IGNORED]`: value ignored (reserved keyword)
