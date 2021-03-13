@@ -89,61 +89,86 @@ Some definitions:
 - `{A,B,...}`: combination, e.g., `A`, `B`, `A,B`, `B,A`, ...
 - `[IGNORED]`: value ignored (reserved keyword)
 
-> **The key-value pair `Action=get` or `Action=update` must be present**
-> **in any query.**
+**The key-value pair `Action=get` or `Action=update`**
+**must be present in any query.**
 
 After deciding for a query action,
 the following further key-value pairs are possible:
 
 - `Action=get`
-  ```
-  Keywords=[strings]
-  Title=[strings]
-  Category=[strings]
-  Severity=[strings]
-  Priority=[strings]
-  ItemGroup=[strings]
-  Status=[strings]
-  AssignedTo=[strings]
-  Release=[strings]
-  OperatingSystem=[strings]
-  Limit=[int]
-  ItemID=[ints]
-  TrackerID={bugs,patch}
-  OpenClosed={open,closed}
-  Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}
-  Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,
-           Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,
-           Release,OperatingSystem,SubmittedBy,OriginatorName,
-           UpdateCallback}
-  LastComment=[IGNORED]
-  SubmittedOn=[IGNORED]
-  ```
+  - `Keywords=[strings]`
+  - `Title=[strings]`
+  - `Category=[strings]`
+  - `Severity=[strings]`
+  - `Priority=[strings]`
+  - `ItemGroup=[strings]`
+  - `Status=[strings]`
+  - `AssignedTo=[strings]`
+  - `Release=[strings]`
+  - `OperatingSystem=[strings]`
+  - `Limit=[int]`
+  - `ItemID=[ints]`
+  - `TrackerID={bugs,patch}`
+  - `OpenClosed={open,closed}`
+  - `Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}`
+  - `OrderBy={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,SubmittedBy,OriginatorName}`
+  - `Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,SubmittedBy,OriginatorName,UpdateCallback}`
+  - `LastComment=[IGNORED]`
+  - `SubmittedOn=[IGNORED]`
 - `Action=update`
-  ```
-  TrackerID={bugs,patch}
-  ItemID=[ints]
-  ```
+  - `TrackerID={bugs,patch}`
+  - `ItemID=[ints]`
 
 
 ## Development and deployment
 
-> This project is work-in-progress!
+This project is developed for the needs of the
+[GNU Octave project](https://savannah.gnu.org/bugs/?group=octave).
 
-This project is developed for the needs of the GNU Octave project, but can with
-moderate effort be adapted for other GNU Savannah projects as well.
+With moderate effort it can be adapted to other GNU Savannah projects as well.
 
-Despite a hopefully better interface, this project can also be used as data
-exporter, if one wants to migrate away from GNU Savannah bug trackers, for
-example.
+Despite a hopefully more intuitive interface,
+this project can additionally be used as data exporter,
+if one wants to migrate away from GNU Savannah bug trackers,
+for example.
 
-To deploy this project on your web server, copy all files to a directory,
+To deploy this project on your web server,
+clone or copy all files of this repository,
 which permits:
 1. execution of PHP scripts.
-   There are currently no known issues about specific PHP versions.
-2. creation of a SQLite cache file `savannah.cache.sqlite`
-   in the web root directory.
+   (There are currently no known issues about specific PHP versions.)
+2. creation of a SQLite cache file `savannah.cache.sqlite`.
 
-The first run(s) of `api.php?Action=update` will take ages until all data
-has been crawled to the local SQLite database.  Successive runs are
-significantly faster and can be used to keep the database in sync with Savannah.
+### Configuration
+
+The server can be configured by `server/config.php`.
+
+The JavaScript client can be configured by `client/config.js`.
+
+### First run
+
+After a successful deployment,
+the data from Savannah has to be crawled to the local database
+e.g. `savannah.cache.sqlite`.
+
+To facilitate this task, execute the script `server/firstrun.php`
+directly on your web server, e.g.
+```
+php firstrun.php 2>&1 | tee firstrun.log.txt
+```
+It requires to find an (empty) file called `FIRSTRUN` in the current
+directory for protection of misuse.
+Create and delete this file with:
+```
+touch FIRSTRUN
+rm -f FIRSTRUN
+```
+
+### Keeping the server in sync with Savannah
+
+Create for example a [cron job](https://en.wikipedia.org/wiki/Cron),
+that periodically triggers an API update query, e.g.
+```
+https://octave.space/savannah/api.php?Action=update
+```
+
