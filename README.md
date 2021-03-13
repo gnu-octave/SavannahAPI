@@ -32,34 +32,55 @@ Discussion text will be searched.
   "subspace" or both terms will be found.
 
 The top search bar also accepts API parameter inputs,
-which are explained in the next section.
+which are explained below.
 
 ### Saved queries
 
-The advanced API searches, especially the API parameters are explained below.
+The advanced API searches (API parameters) are explained in the next section.
 
-1. One can create and save queries in the local web browser cache.  Changes remain even after closing the web browser.
+This section explains, how predefined queries can be modified.
+Changes are stored in the local web browser cache
+and remain even after closing the web browser.
+The reset to the default state is explained below.
+
+1. One can create and save queries.
    ![new saved query](doc/new_saved_query.gif)
-2. Previously created saved queries can be edited and updated by clicking the middle edit button.
-   **After editing, do not forget to refresh** the results by clicking on the left refresh button.
+2. Previously created saved queries can be edited and updated
+   by clicking the middle edit button.
+   **After editing, do not forget to refresh** the results
+   by clicking on the left refresh button.
    ![edit](doc/edit_saved_query.gif)
 3. If the saved query is expanded, all saved fields of the query can be edited.
    ![edit expanded](doc/edit_saved_query_expanded.gif)
 4. One can reorder the queries by drag and drop.
-   The drag and drop can only be done with the double arrow icon left of the "+" button with result count.
+   The drag and drop can only be done with the double arrow icon
+   left of the "+" button with result count.
    (Sorry, a fancy drag animation is missing).
    ![reorder](doc/reorder_saved_queries.gif)
-5. By expanding the "Settings" section at the bottom of the page, on can save, restore, and reset the web application to the default state.
+5. By expanding the "Settings" section at the bottom of the page,
+   one can save, restore, and reset the web application to the default state.
    ![reset](doc/reset_to_default.gif)
 
-## Advanced API searches
 
-To be explained...
+## Advanced API searches (queries)
+
+To narrow down the search results,
+a **query language** of `&`-separated **key=value** pairs can be used,
+which is related to an
+[URL query string](https://en.wikipedia.org/wiki/Query_string).
+This query language can be used to directly request data from the web API.
+
+For example: the top bar search for `"krylov subspace"` is equivalent to
+```
+https://octave.space/savannah/api.php?Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Keywords=Krylov%20subspace
+[ ------------ API URL ------------ ] [ ------------------------------ API parameter ----------------------------- ]
+```
+and can be used independently of the JavaScript client on the website.
 
 
-### The API syntax and grammar
+### API parameter syntax and grammar
 
-Explanation:
+Some definitions:
 - `[string]`: string with white space, e.g. `"krylov  subspace"`
 - `[strings]`: `[string],[string],...`, e.g. `"krylov,subspace"`
 - `[int]`: non-negative integer, e.g. `1`, `42`, `12345`, ...
@@ -68,42 +89,41 @@ Explanation:
 - `{A,B,...}`: combination, e.g., `A`, `B`, `A,B`, `B,A`, ...
 - `[IGNORED]`: value ignored (reserved keyword)
 
-```
-Action=get
+> **The key-value pair `Action=get` or `Action=update` must be present**
+> **in any query.**
 
-    Keywords=[strings]
-    Title=[strings]
-    Category=[strings]
-    Severity=[strings]
-    Priority=[strings]
-    ItemGroup=[strings]
-    Status=[strings]
-    AssignedTo=[strings]
-    Release=[strings]
-    OperatingSystem=[strings]
-    Limit=[int]
-    ItemID=[ints]
-    TrackerID={bugs,patch}
-    OpenClosed={open,closed}
-    Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}
-    Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,
-             Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,
-             Release,OperatingSystem,SubmittedBy,OriginatorName,
-             UpdateCallback}
-    LastComment=[IGNORED]
-    SubmittedOn=[IGNORED]
+After deciding for a query action,
+the following further key-value pairs are possible:
 
-
-Action=update
-
-    TrackerID={bugs,patch}
-    ItemID=[ints]
-```
-
-
-### Saving queries in the local web browser
-
-To be explained...
+- `Action=get`
+  ```
+  Keywords=[strings]
+  Title=[strings]
+  Category=[strings]
+  Severity=[strings]
+  Priority=[strings]
+  ItemGroup=[strings]
+  Status=[strings]
+  AssignedTo=[strings]
+  Release=[strings]
+  OperatingSystem=[strings]
+  Limit=[int]
+  ItemID=[ints]
+  TrackerID={bugs,patch}
+  OpenClosed={open,closed}
+  Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}
+  Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,
+           Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,
+           Release,OperatingSystem,SubmittedBy,OriginatorName,
+           UpdateCallback}
+  LastComment=[IGNORED]
+  SubmittedOn=[IGNORED]
+  ```
+- `Action=update`
+  ```
+  TrackerID={bugs,patch}
+  ItemID=[ints]
+  ```
 
 
 ## Development and deployment
