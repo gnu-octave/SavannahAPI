@@ -9,6 +9,8 @@ A more systematic overview about bugs and patches
 
 ### Top search bar
 
+![top search bar](doc/top_search_bar.gif)
+
 Works as any other usual search bar:
 enter keywords, hit enter, or press the left search button.
 The right clear button clears all fields.
@@ -32,8 +34,25 @@ Discussion text will be searched.
 The top search bar also accepts API parameter inputs,
 which are explained in the next section.
 
+### Saved queries
 
-### Advanced API searches
+The advanced API searches, especially the API parameters are explained below.
+
+1. One can create and save queries in the local web browser cache.  Changes remain even after closing the web browser.
+   ![new saved query](doc/new_saved_query.gif)
+2. Previously created saved queries can be edited and updated by clicking the middle edit button.
+   **After editing, do not forget to refresh** the results by clicking on the left refresh button.
+   ![edit](doc/edit_saved_query.gif)
+3. If the saved query is expanded, all saved fields of the query can be edited.
+   ![edit expanded](doc/edit_saved_query_expanded.gif)
+4. One can reorder the queries by drag and drop.
+   The drag and drop can only be done with the double arrow icon left of the "+" button with result count.
+   (Sorry, a fancy drag animation is missing).
+   ![reorder](doc/reorder_saved_queries.gif)
+5. By expanding the "Settings" section at the bottom of the page, on can save, restore, and reset the web application to the default state.
+   ![reset](doc/reset_to_default.gif)
+
+## Advanced API searches
 
 To be explained...
 
