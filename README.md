@@ -135,6 +135,7 @@ the following further key-value pairs are possible:
   - `OpenClosed={open,closed}`
   - `Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}`
   - `OrderBy={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,SubmittedBy,OriginatorName}`
+
      The sorting order is ascending.
      If the column name has a `!` prefix, the sorting is descending.
   - `Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,SubmittedBy,OriginatorName,UpdateCallback}`
