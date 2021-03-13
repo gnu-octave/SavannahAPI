@@ -78,9 +78,20 @@ https://octave.space/savannah/api.php?Action=get&OrderBy=TrackerID,!ItemID&Forma
 and can be used independently of the JavaScript client on the website.
 
 
+### Octave Forge
+
+One can create saved queries (see above) to monitor Savannah bugs
+of a particular Octave Forge package.
+For example:
+- [All bugs of the io-package](https://octave.space/savannah/api.php?Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=[octave%20forge]%20(io))
+- [All **open** bugs of the io-package](https://octave.space/savannah/api.php?Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=[octave%20forge]%20(io)&OpenClosed=open)
+
+
 ### API parameter syntax and grammar
 
-Some definitions:
+All API parameter are `key=value` pairs.
+
+Some `value` definitions:
 - `[string]`: string with white space, e.g. `"krylov  subspace"`
 - `[strings]`: `[string],[string],...`, e.g. `"krylov,subspace"`
 - `[int]`: non-negative integer, e.g. `1`, `42`, `12345`, ...
@@ -88,6 +99,12 @@ Some definitions:
 - `{A|B|...}`: exactly one, e.g., `A`, `B`, ...
 - `{A,B,...}`: combination, e.g., `A`, `B`, `A,B`, `B,A`, ...
 - `[IGNORED]`: value ignored (reserved keyword)
+
+Most key-value pairs allow **inverted searches** `key!=value`.  For example:
+- `Category=Forge,website`:
+  column "Category" contains string "Forge" **OR** string "website".
+- `Category!=Forge,website`:
+  column "Category" **does not** contain string "Forge" **AND** string "website".
 
 **The key-value pair `Action=get` or `Action=update`**
 **must be present in any query.**
@@ -112,6 +129,8 @@ the following further key-value pairs are possible:
   - `OpenClosed={open,closed}`
   - `Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}`
   - `OrderBy={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,SubmittedBy,OriginatorName}`
+     The sorting order is ascending.
+     If the column name has a `!` prefix, the sorting is descending.
   - `Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,SubmittedBy,OriginatorName,UpdateCallback}`
   - `LastComment=[IGNORED]`
   - `SubmittedOn=[IGNORED]`
