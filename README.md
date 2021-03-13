@@ -81,10 +81,14 @@ and can be used independently of the JavaScript client on the website.
 ### Octave Forge
 
 One can create saved queries (see above) to monitor Savannah bugs
-of a particular Octave Forge package.
+of a particular Octave Forge package or directly use the `api.php`
+to create the table for embedding it into another website.
+
 For example:
 - [All bugs of the io-package](https://octave.space/savannah/api.php?Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=[octave%20forge]%20(io))
+  `Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=[octave forge] (io)`
 - [All **open** bugs of the io-package](https://octave.space/savannah/api.php?Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=[octave%20forge]%20(io)&OpenClosed=open)
+  `Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=[octave forge] (io)&OpenClosed=open`
 
 
 ### API parameter syntax and grammar
