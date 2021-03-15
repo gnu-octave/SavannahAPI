@@ -42,9 +42,9 @@ Works as any other "usual" search bar:
 
 ### Synchronizing with Savannah
 
-SavannahAPI [scraps](https://en.wikipedia.org/wiki/Web_scraping)
+SavannahAPI [scrapes](https://en.wikipedia.org/wiki/Web_scraping)
 periodically (every minute) the original Savannah website
-and Synchronizes changes.
+and synchronizes changes.
 
 ![project overview](doc/item_sync.png)
 
