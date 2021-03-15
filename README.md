@@ -40,6 +40,20 @@ Works as any other "usual" search bar:
   which are explained in the following sections.
 
 
+### Synchronizing with Savannah
+
+SavannahAPI [scraps](https://en.wikipedia.org/wiki/Web_scraping)
+periodically (every minute) the original Savannah website
+and Synchronizes changes.
+
+![project overview](doc/item_sync.png)
+
+If you are impatient or detected a synchronization error,
+you can force the synchronization of a certain item by clicking on the small
+blue arrow symbol at the very left of each table column in the standard
+HTMLCSS output format.
+
+
 ### Saved queries
 
 This section explains, how predefined queries can be modified.
@@ -171,6 +185,8 @@ the following further key-value pairs are possible:
 
 
 ## Development and deployment
+
+[![project overview](doc/project_overview_thumb.jpg)](https://raw.githubusercontent.com/gnu-octave/SavannahAPI/main/doc/project_overview.jpg)
 
 This project is developed for the needs of the
 [GNU Octave project](https://savannah.gnu.org/bugs/?group=octave).
