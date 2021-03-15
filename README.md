@@ -11,58 +11,78 @@ A more systematic overview about bugs and patches
 
 ![top search bar](doc/top_search_bar.gif)
 
-Works as any other usual search bar:
-enter keywords, hit enter, or press the left search button.
-The right clear button clears all fields.
+Works as any other "usual" search bar:
 
-If the input are simple keywords all items (bugs and patches) Title and
-Discussion text will be searched.
+- Enter keywords and then hit enter or press the left search button.
 
-- **white space** separated words are treated as a single search term.
-  For example, `"krylov subspace"` will look for titles and discussions
-  containing both words in this order.  The search result is likely different
-  from `"subspace krylov"`.
+- The right clear button clears all fields.
 
-- **white space matters:** `"krylov subspace"` and `"krylov  subspace"`
-  (with two spaces) are different search terms.
+- **Simple keywords as search queries** are matched with the Title and
+  Discussion texts of all items (bugs and patches).
 
-- **commas** are treated as "OR-searches".
-  For example, `"krylov,subspace"` and `"subspace,krylov"` both have the same
-  search result.  Titles and discussions containing either "krylov" or
-  "subspace" or both terms will be found.
+- **White space separated words** are treated as a single search term.
 
-The top search bar also accepts API parameter inputs,
-which are explained below.
+  For example, `"krylov subspace"` will look for Title and Discussion text
+  containing both words in this order.
+
+  The search result is likely different from `"subspace krylov"`.
+
+- **White space matters:** `"krylov subspace"` and `"krylov  subspace"`
+  (with two spaces) are different search queries.
+
+- **Commas** are treated as logical "OR"-operator.
+  For example,
+  `"krylov,subspace"` and `"subspace,krylov"` are identical search queries.
+  Title and Discussion texts containing either "krylov", "subspace",
+  or both terms will be found.
+
+- The top search bar also accepts **advanced API parameter search queries**,
+  which are explained in the following sections.
+
 
 ### Saved queries
-
-The advanced API searches (API parameters) are explained in the next section.
 
 This section explains, how predefined queries can be modified.
 Changes are stored in the local web browser cache
 and remain even after closing the web browser.
 The reset to the default state is explained below.
 
-1. One can create and save queries.
-   ![new saved query](doc/new_saved_query.gif)
-2. Previously created saved queries can be edited and updated
-   by clicking the middle edit button.
-   **After editing, do not forget to refresh** the results
-   by clicking on the left refresh button.
-   ![edit](doc/edit_saved_query.gif)
-3. If the saved query is expanded, all saved fields of the query can be edited.
-   ![edit expanded](doc/edit_saved_query_expanded.gif)
-4. One can reorder the queries by drag and drop.
-   The drag and drop can only be done with the double arrow icon
-   left of the "+" button with result count.
-   (Sorry, a fancy drag animation is missing).
-   ![reorder](doc/reorder_saved_queries.gif)
-5. By expanding the "Settings" section at the bottom of the page,
-   one can save, restore, and reset the web application to the default state.
-   ![reset](doc/reset_to_default.gif)
+#### Create and save queries
+
+![new saved query](doc/new_saved_query.gif)
+
+#### Edit saved queries
+
+**After editing, do not forget to refresh** the results
+by clicking on the left refresh button.
+
+Previously created saved queries can be edited and updated
+by clicking the middle edit button.
+
+![edit](doc/edit_saved_query.gif)
+
+If the saved query is expanded, all saved fields of the query can be edited.
+
+![edit expanded](doc/edit_saved_query_expanded.gif)
+
+#### Reorder saved queries
+
+One can reorder the queries by drag and drop.
+The drag and drop can only be done with the double arrow icon
+left of the "+" button with result count.
+(A fancy drag animation is missing).
+
+![reorder](doc/reorder_saved_queries.gif)
+
+#### Reset to default
+
+By expanding the "Settings" section at the bottom of the page,
+one can save, restore, and reset the web application to the default state.
+
+![reset](doc/reset_to_default.gif)
 
 
-## Advanced API searches (queries)
+## Advanced API parameter search queries
 
 To narrow down the search results,
 a **query language** of `&`-separated **key=value** pairs can be used,
@@ -91,6 +111,10 @@ For example:
 - [All **open** bugs of the io-package](https://octave.space/savannah/api.php?Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=[octave%20forge]%20(io)&OpenClosed=open)
 
   `Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Title=[octave%20forge]%20(io)&OpenClosed=open`
+
+> As proof of concept,
+> a **full Octave Forge package issue overview** can be obtained by
+> importing the string "forge" ([see how](doc/forge.gif)).
 
 
 ### API parameter syntax and grammar
