@@ -53,8 +53,8 @@ The reset to the default state is explained below.
 
 #### Edit saved queries
 
-**After editing, do not forget to refresh** the results
-by clicking on the left refresh button.
+> **After editing, do not forget to refresh** the results
+> by clicking on the left refresh button.
 
 Previously created saved queries can be edited and updated
 by clicking the middle edit button.
