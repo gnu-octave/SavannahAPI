@@ -414,7 +414,9 @@ class QueryWidget {
       </div>
       <div class="form-group input-group">
         <div class="input-group-prepend">
-          <div class="input-group-text">API parameter</div>
+          <div class="input-group-text">
+            API parameter<br>(space = %20)
+          </div>
         </div>
         <textarea class="form-control">${params}</textarea>
       </div>`;
