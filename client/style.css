@@ -23,6 +23,11 @@ noscript {
 .button-width-mod { min-width: 85px; }
 }
 
+table {
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
 table td { white-space: nowrap; }
 
 .table-hover tbody tr:hover {
