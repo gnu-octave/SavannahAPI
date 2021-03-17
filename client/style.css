@@ -23,6 +23,7 @@ noscript {
 .button-width-mod { min-width: 85px; }
 }
 
+div#quickSearchResult,
 table {
   max-height: 400px;
   overflow-y: scroll;
