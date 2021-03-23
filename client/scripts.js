@@ -256,8 +256,6 @@ class QuickSearchWidget {
     this.result = new QueryResult();
     this.repaint();
 
-    $("#quickSearchInput")[0].value = url_get_params;
-
     var self = this;
     $("#quickSearchClearButton").click(function(event) {
         self.result = new QueryResult();
@@ -273,6 +271,11 @@ class QuickSearchWidget {
           $("#quickSearchSubmitButton").click();
         }
       });
+
+    if (url_get_params) {
+      $("#quickSearchInput")[0].value = url_get_params;
+      this.send();
+    }
   }
 
   setResultHTML(result) {
