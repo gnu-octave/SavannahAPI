@@ -226,6 +226,9 @@ class api
         array_unshift($columns , 'UpdateCallback');
       }
     }
+    if (count ($items) <= 0) {
+      return $this->JSON("info", "No matching items founds.");
+    }
     $fmt = new formatter($items, $columns);
     if (!array_key_exists('Format', $request)) {
       return $fmt->asJSON();
