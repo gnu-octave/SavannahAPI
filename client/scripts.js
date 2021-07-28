@@ -62,15 +62,25 @@ class Query {
       function (keyVal) {
         var [key, val] = keyVal.split("=");
         if ((key === 'Keywords') || (key === 'Title')) {
-          val = encodeURIComponent(decodeURIComponent(val));
+          try {
+            val = decodeURIComponent(val);
+          } catch(e) {
+            // ignore
+          }
+          val = encodeURIComponent(val);
         }
         str += key + "=" + val + "&";
       });
     return str.slice(0, -1);  // trim last ampersand
   }
   getBeautifulQueryString() {
-    var str = decodeURIComponent(this.api).replaceAll(" ", "%20");
-    return str.replaceAll("&", "\n");
+    var str = this.api;
+    try {
+      str = decodeURIComponent(str);
+    } catch(e) {
+      // ignore
+    }
+    return str.replaceAll(" ", "%20").replaceAll("&", "\n");
   }
 }
 
