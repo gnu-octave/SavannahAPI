@@ -35,7 +35,7 @@ $(document).ready(function(){
  *
  * @param label string to identify the query
  *
- * @param url some url assiciated to the query
+ * @param url some url associated to the query
  *
  * @param api parameters to query SavannahAPI.  For example:
  *              `Action=get&TrackerID=bugs` or very sloppy from user input
@@ -52,10 +52,25 @@ class Query {
     return new Query("New query", "", localStorage.getItem("defaultQuery"));
   }
   getLabel()       { return this.label; }
-  getQueryString() { return this.api; }
   getURL()         { return this.url; }
   getPermaLink() {
     return localStorage.getItem("apiURL") + '?' + this.getQueryString();
+  }
+  getQueryString() {
+    var str = '';
+    this.api.split("&").forEach(
+      function (keyVal) {
+        var [key, val] = keyVal.split("=");
+        if ((key === 'Keywords') || (key === 'Title')) {
+          val = encodeURIComponent(decodeURIComponent(val));
+        }
+        str += key + "=" + val + "&";
+      });
+    return str.slice(0, -1);  // trim last ampersand
+  }
+  getBeautifulQueryString() {
+    var str = decodeURIComponent(this.api).replaceAll(" ", "%20");
+    return str.replaceAll("&", "\n");
   }
 }
 
@@ -309,9 +324,9 @@ class QuickSearchWidget {
     } else {
       var qstring
         = 'Action=get&OrderBy=TrackerID,!ItemID&Format=HTMLCSS&Keywords=';
-      qstring += input.replaceAll(' ', '%20');
+      qstring += encodeURIComponent(input);
     }
-    return new Query('', '', qstring, '');
+    return new Query('', '', qstring);
   }
 
   send(params) {
@@ -379,7 +394,7 @@ class QueryWidget {
     var query  = this.query;
     var params = this.parameter
                ? this.parameter.value
-               : this.query.getQueryString().replaceAll("&", "\n");
+               : this.query.getBeautifulQueryString();
     var element = document.createElement(null);
     if (this.readonly) {
       var labelHTML = `
