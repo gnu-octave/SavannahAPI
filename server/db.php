@@ -122,6 +122,10 @@ class db
             $op = (is_null($op) ? $eq : $op);
             $makeValid = (!is_null($makeValid) ? $makeValid
               : function($v){ return array_search($v, CONFIG::ITEM_STATE); });
+          case 'AttachedFiles':
+            $op = (is_null($op) ? $eq : $op);
+            $makeValid = (!is_null($makeValid) ? $makeValid
+              : function($v){ return "$v"; });
           case 'ItemID':
           case 'Title':
           case 'SubmittedBy':

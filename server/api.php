@@ -152,7 +152,7 @@ class api
       $values = explode(',', $request[$key]);
       if (!is_array($values)
           || (count($values) === 0)
-          || (count($values) !== count(array_filter($values)))) {
+          || (count($values) !== count(array_filter($values, 'strlen')))) {
         return "Parameter key '$key': Invalid or empty values given.";
       }
       // Validate individual values, if list of valid values is given.
