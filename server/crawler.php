@@ -238,6 +238,14 @@ class crawler
       }
       $item["LastComment"] = $maxDate;
     }
+
+    // Extract number of attached files.
+    $item['AttachedFiles'] = $xpath->query(
+      '//div[@id="hidsubpartcontentattached"]'
+      . '//div[@class="boxitem" or @class="boxitemalt"]')->length;
+
+    DEBUG_LOG("----> Found " . $item['AttachedFiles'] . " attached files.");
+
     return array($item, $discussion);
   }
 

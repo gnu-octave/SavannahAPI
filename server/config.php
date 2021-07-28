@@ -57,7 +57,8 @@ class CONFIG
     'Originator Name:'  => ['OriginatorName' , 'TEXT'              ],
     'Open/Closed:'      => ['OpenClosed'     , 'INTEGER NOT NULL'  ],
     'Release:'          => ['Release'        , 'TEXT'              ],
-    'Operating System:' => ['OperatingSystem', 'TEXT'              ]
+    'Operating System:' => ['OperatingSystem', 'TEXT'              ],
+    'Attached Files'    => ['AttachedFiles'  , 'INTEGER NOT NULL'  ]
     ];
 
   const DISCUSSION_DATA = [
