@@ -168,16 +168,17 @@ the following further key-value pairs are possible:
   - `Release=[strings]`
   - `OperatingSystem=[strings]`
   - `AttachedFiles=[ints]`
+  - `AttachedFileNames=[strings]`
   - `Limit=[int]`
   - `ItemID=[ints]`
   - `TrackerID={bugs,patch}`
   - `OpenClosed={open,closed}`
   - `Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}`
-  - `OrderBy={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,AttachedFiles,SubmittedBy,OriginatorName}`
+  - `OrderBy={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,AttachedFiles,AttachedFileNames,SubmittedBy,OriginatorName}`
 
      The sorting order is ascending.
      If the column name has a `!` prefix, the sorting is descending.
-  - `Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,AttachedFiles,SubmittedBy,OriginatorName,UpdateCallback}`
+  - `Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,AttachedFiles,AttachedFileNames,SubmittedBy,OriginatorName,UpdateCallback}`
   - `LastComment=[IGNORED]`
   - `SubmittedOn=[IGNORED]`
 - `Action=update`
