@@ -220,8 +220,9 @@ class api
       $columns = array_column(array_values(CONFIG::ITEM_DATA), 0);
       if ($request['Format'] === 'HTMLCSS') {
         // Do not show some uninteresting fields.
-        unset($columns[array_search('SubmittedBy',    $columns)]);
-        unset($columns[array_search('OriginatorName', $columns)]);
+        unset($columns[array_search('SubmittedBy',       $columns)]);
+        unset($columns[array_search('OriginatorName',    $columns)]);
+        unset($columns[array_search('AttachedFileNames', $columns)]);
         // Show UpdateCallback.
         array_unshift($columns , 'UpdateCallback');
       }

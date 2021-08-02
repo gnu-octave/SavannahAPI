@@ -41,24 +41,25 @@ class CONFIG
    * Alter with care!  "ID" is a reserved database column name.
    */
   const ITEM_DATA = [
-  // label on website       database column  , database datatype
-    'TrackerID:'        => ['TrackerID'      , 'INTEGER NOT NULL'  ],
-    'ID:'               => ['ItemID'         , 'INTEGER NOT NULL'  ],
-    'Title:'            => ['Title'          , 'TEXT'              ],
-    'Submitted by:'     => ['SubmittedBy'    , 'TEXT'              ],
-    'Submitted on:'     => ['SubmittedOn'    , 'TIMESTAMP NOT NULL'],
-    'Last comment:'     => ['LastComment'    , 'TIMESTAMP NOT NULL'],
-    'Category:'         => ['Category'       , 'TEXT'              ],
-    'Severity:'         => ['Severity'       , 'TEXT'              ],
-    'Priority:'         => ['Priority'       , 'TEXT'              ],
-    'Item Group:'       => ['ItemGroup'      , 'TEXT'              ],
-    'Status:'           => ['Status'         , 'TEXT'              ],
-    'Assigned to:'      => ['AssignedTo'     , 'TEXT'              ],
-    'Originator Name:'  => ['OriginatorName' , 'TEXT'              ],
-    'Open/Closed:'      => ['OpenClosed'     , 'INTEGER NOT NULL'  ],
-    'Release:'          => ['Release'        , 'TEXT'              ],
-    'Operating System:' => ['OperatingSystem', 'TEXT'              ],
-    'Attached Files'    => ['AttachedFiles'  , 'INTEGER NOT NULL'  ]
+  // label on website         database column     , database datatype
+    'TrackerID:'          => ['TrackerID'         , 'INTEGER NOT NULL'  ],
+    'ID:'                 => ['ItemID'            , 'INTEGER NOT NULL'  ],
+    'Title:'              => ['Title'             , 'TEXT'              ],
+    'Submitted by:'       => ['SubmittedBy'       , 'TEXT'              ],
+    'Submitted on:'       => ['SubmittedOn'       , 'TIMESTAMP NOT NULL'],
+    'Last comment:'       => ['LastComment'       , 'TIMESTAMP NOT NULL'],
+    'Category:'           => ['Category'          , 'TEXT'              ],
+    'Severity:'           => ['Severity'          , 'TEXT'              ],
+    'Priority:'           => ['Priority'          , 'TEXT'              ],
+    'Item Group:'         => ['ItemGroup'         , 'TEXT'              ],
+    'Status:'             => ['Status'            , 'TEXT'              ],
+    'Assigned to:'        => ['AssignedTo'        , 'TEXT'              ],
+    'Originator Name:'    => ['OriginatorName'    , 'TEXT'              ],
+    'Open/Closed:'        => ['OpenClosed'        , 'INTEGER NOT NULL'  ],
+    'Release:'            => ['Release'           , 'TEXT'              ],
+    'Operating System:'   => ['OperatingSystem'   , 'TEXT'              ],
+    'Attached Files'      => ['AttachedFiles'     , 'INTEGER NOT NULL'  ],
+    'Attached File Names' => ['AttachedFileNames' , 'TEXT'              ]
     ];
 
   const DISCUSSION_DATA = [

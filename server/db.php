@@ -87,7 +87,7 @@ class db
   /**
    * Retrieve a filtered list of items.
    *
-   * @param filter FIXME: unused yet.
+   * @param filter a validated array like created from `$_GET`.
    *
    * @returns an array of items.
    */
@@ -141,6 +141,7 @@ class db
           case 'OriginatorName':
           case 'Release':
           case 'OperatingSystem':
+          case 'AttachedFileNames':
             $op = (is_null($op) ? $like : $op);
             $makeValid = (!is_null($makeValid) ? $makeValid
               : function($v){ return "%$v%"; });

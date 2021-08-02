@@ -49,7 +49,6 @@ class crawler
         $date = explode("$Y", $day, 2);
         $day  = $date[1];
         $date = (int) strtotime($date[0] . "$Y");
-        //FIXME DEBUG_LOG(date("Y-m-d", $date) . " < " . date("Y-m-d", $lastTimestamp));
         if ($date < $lastTimestamp) {
           continue;
         }
@@ -240,9 +239,14 @@ class crawler
     }
 
     // Extract number of attached files.
-    $item['AttachedFiles'] = $xpath->query(
-      '//div[@id="hidsubpartcontentattached"]'
-      . '//div[@class="boxitem" or @class="boxitemalt"]')->length;
+    $attachments = $xpath->query('//div[@id="hidsubpartcontentattached"]'
+                       . '//div[@class="boxitem" or @class="boxitemalt"]');
+    $item['AttachedFiles']     = $attachments->length;
+    $item['AttachedFileNames'] = '';
+    foreach ($attachments as $attachment) {
+      $a = $xpath->query('./a', $attachment);
+      $item['AttachedFileNames'] .= $a[0]->textContent . ', ';
+    }
 
     DEBUG_LOG("----> Found " . $item['AttachedFiles'] . " attached files.");
 
