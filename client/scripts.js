@@ -245,7 +245,7 @@ class QueryWidgetList {
   }
 
   /**
-   * Swap two list elements persistently given their indices.
+   * Insert list element A before B persistently given their indices.
    *
    * This function stores the new order persistently and swaps the graphical
    * Node representation.
@@ -254,20 +254,27 @@ class QueryWidgetList {
    *
    * @param indexB and index value
    */
-  swap(indexA, indexB) {
+  insertBefore(indexA, indexB) {
+    indexA = Number(indexA);
+    indexB = Number(indexB);
     if (indexA != indexB) {
-      // Data structure swap.
-      var tmp = this.items[indexA];
-      this.items[indexA] = this.items[indexB];
-      this.items[indexB] = tmp;
+      // Change data structure.
+      while (indexA < (indexB - 1)) {
+        var tmp = this.items[indexA];
+        this.items[indexA] = this.items[indexA + 1];
+        this.items[indexA + 1] = tmp;
+        indexA++;
+      }
+      while (indexA > indexB) {
+        var tmp = this.items[indexA];
+        this.items[indexA] = this.items[indexA - 1];
+        this.items[indexA - 1] = tmp;
+        indexA--;
+      }
       this.save();
-      // Node swap.
-      var nodeA = this.items[indexA].getNode();
-      var nodeB = this.items[indexB].getNode();
-      const siblingA = (nodeA.nextSibling === nodeB) ? nodeA
-                                                     : nodeA.nextSibling;
-      this.rootNode.insertBefore(nodeA, nodeB);
-      this.rootNode.insertBefore(nodeB, siblingA);
+      // Change Nodes.
+      this.rootNode.insertBefore(this.items[indexA].getNode(),
+                                 this.items[indexA + 1].getNode());
     }
   }
 }
@@ -580,8 +587,8 @@ class QueryWidget {
 
   drop(event) {
     event.preventDefault();
-    this.list.swap(event.dataTransfer.getData("index"),
-                   this.list.getIndexOf(this));
+    this.list.insertBefore(event.dataTransfer.getData("index"),
+                           this.list.getIndexOf(this));
   }
 
   allowDrop(event) {
