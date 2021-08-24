@@ -5,18 +5,29 @@ noscript {
   display: block;
 }
 
+a, a:hover { text-decoration: none; }
+
 .md-toast-error   { background-color: #ffb0b0; }
 .md-toast-success { background-color: #c3fdb8; }
 .md-toast-info    { background-color: #82cafa; }
 .md-toast-warning { background-color: #fff7a7; }
 
+.btn-info {
+  color: #fff;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-info:hover,
+.btn-info:active {
+  color: #fff;
+  background-color: #127b8c;
+  border-color: #127b8c;
+}
+
 .card-header-mod {
   padding-top: .25rem;
   padding-bottom: .25rem;
-}
-
-.badge-light-mod {
-  background-color: gold;
 }
 
 @media (min-width: 575.98px) {
@@ -25,6 +36,7 @@ noscript {
 
 div#quickSearchResult,
 table {
+  display: block;
   max-height: 400px;
   overflow-y: scroll;
 }

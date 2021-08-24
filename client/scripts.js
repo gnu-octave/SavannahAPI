@@ -408,7 +408,7 @@ class QueryWidget {
     var element = document.createElement(null);
     if (this.readonly) {
       var labelHTML = `
-        <div class="font-weight-bold mt-2">
+        <div class="fw-bold mt-2">
           ${query.getLabel()}
           ${(query.getURL()
             ? `&nbsp;&nbsp;<a href="${query.getURL()}">[link]</a>`
@@ -433,18 +433,14 @@ class QueryWidget {
           </button>
         </div>`;
       var formHTML = `
-      <div class="form-group input-group">
-        <div class="input-group-prepend">
-          <div class="input-group-text">url</div>
-        </div>
+      <div class="input-group mb-3">
+        <div class="input-group-text">url</div>
         <input type="url" class="form-control"
                value="${this.url ? this.url.value : query.getURL()}">
       </div>
-      <div class="form-group input-group">
-        <div class="input-group-prepend">
-          <div class="input-group-text">
-            API parameter<br>(space = %20)
-          </div>
+      <div class="input-group mb-3">
+        <div class="input-group-text">
+          API parameter<br>(space = %20)
         </div>
         <textarea class="form-control">${params}</textarea>
       </div>`;
@@ -463,8 +459,8 @@ class QueryWidget {
                       data-toggle="collapse"
                       data-target=""
                       aria-expanded="true">
-                &nbsp;<i class="fas fa-plus"></i>&nbsp;
-                <span class="badge badge-pill badge-light badge-light-mod">
+                <i class="fas fa-plus"></i>&nbsp;
+                <span class="badge rounded-pill bg-warning text-dark">
                   ${this.result.getCount()}
                 </span>
               </button>
@@ -707,10 +703,9 @@ function showPopup(type, message, delay=10000) {
   <div role="alert" aria-life="assertive" aria-atomic="true"
        class="toast md-toast-${type}">
     <div class="toast-header md-toast-${type}">
-      <strong class="mr-auto">${headText}</strong>
-      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast"
+      <strong class="me-auto">${headText}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast"
               aria-label="Close">
-        <span aria-hidden="true">×</span>
       </button>
     </div>
     <div class="toast-body md-toast-${type}">

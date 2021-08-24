@@ -7,18 +7,18 @@
         content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
-        integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
-        crossorigin="anonymous">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
         crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+  <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+          integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
           crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
           crossorigin="anonymous"></script>
 
   <script src="client/config.js"></script>
@@ -64,31 +64,27 @@
       </a>
       &nbsp;&nbsp;&nbsp;
       <a href="https://github.com/gnu-octave/SavannahAPI">
-        <i class="fas fa-book"></i></i> Help
+        <i class="fas fa-book"></i> Help
       </a>
     </div>
     <noscript>JavaScript must be enabled to run this tool.</noscript>
     <div class="m-1">
       <div class="form-group input-group">
-        <div class="input-group-prepend">
-          <button type="button" id="quickSearchSubmitButton"
-                  class="btn btn-lg btn-info">
-            <i class="fas fa-search"></i>
-            <span class="d-none d-sm-inline">
-              &nbsp;Search&nbsp;
-            </span>
-            <span id="quickSearchCount">(0)</span>
-          </button>
-        </div>
+        <button type="button" id="quickSearchSubmitButton"
+                class="btn btn-lg btn-info">
+          <i class="fas fa-search"></i>
+          <span class="d-none d-sm-inline">
+            &nbsp;Search&nbsp;
+          </span>
+          <span id="quickSearchCount">(0)</span>
+        </button>
         <input type="text" id="quickSearchInput"
                class="form-control form-control-lg">
-        <div class="input-group-append">
-          <button type="button" id="quickSearchClearButton"
-                  class="btn btn-lg btn-secondary">
-            <span class="d-none d-sm-inline">Clear</span>
-            <span class="d-inline d-sm-none"><i class="fas fa-ban"></i></span>
-          </button>
-        </div>
+        <button type="button" id="quickSearchClearButton"
+                class="btn btn-lg btn-secondary">
+          <span class="d-none d-sm-inline">Clear</span>
+          <span class="d-inline d-sm-none"><i class="fas fa-ban"></i></span>
+        </button>
       </div>
     </div>
     <div id="quickSearchResult" class="overflow-auto">
@@ -119,10 +115,8 @@
           <i class="fas fa-exclamation-triangle"></i> Reset to default
         </button>
       </div>
-      <div class="form-group input-group">
-        <div class="input-group-prepend">
-          <div class="input-group-text">JSON data</div>
-        </div>
+      <div class="input-group mb-3">
+        <div class="input-group-text">JSON data</div>
         <textarea id="appImportExport" class="form-control"></textarea>
       </div>
     </details>
