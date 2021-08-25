@@ -306,6 +306,7 @@ class api
           if ($nextLookup <= 0) {
             $db->setTimer("crawlUpdatedItems_$tracker", time());
             $lastComment = $db->getMaxLastCommentFromTracker($trackerID);
+            $lastComment = strtotime("-1 day", $lastComment);
             $ids = array_merge($ids, $crawler->crawlUpdatedItems($tracker,
                                                                 $lastComment));
           } else {
