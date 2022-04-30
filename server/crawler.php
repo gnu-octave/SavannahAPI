@@ -179,17 +179,25 @@ class crawler
     $xpath = new DOMXpath($doc);
     $metadata = $xpath->query('//form/table[1]');
     if ($metadata->length > 0) {
-      $metadata = explode("\n", $metadata[0]->nodeValue);
-      foreach ($metadata as $idx=>$key) {
-        $key = trim($key, " \u{a0}");  // remove space and fixed space
+      foreach ($xpath->query('tr', $metadata[0]) as $metarow) {
+        $metacols = $metarow->getElementsByTagName('td');
+        if ($metacols->length >= 2) {
+          $metaitems[$metacols[0]->nodeValue] = $metacols[1]->nodeValue;
+        }
+        if ($metacols->length >= 4) {
+          $metaitems[$metacols[2]->nodeValue] = $metacols[3]->nodeValue;
+        }
+      }
+      foreach ($metaitems as $key=>$value) {
+        $key = trim($key, "* \u{a0}");  // remove asterisk, space, and fixed space
+        $value = trim($value);
         if (array_key_exists($key, CONFIG::ITEM_DATA)) {
-          $value = $metadata[$idx + 1];
           switch ($key) {
             case 'Submitted by:':
-              $value = trim(htmlspecialchars($value));
+              $value = htmlspecialchars($value);
               break;
             case 'Assigned to:':
-              $value = trim(htmlspecialchars($value));
+              $value = htmlspecialchars($value);
               break;
             case 'Submitted on:':          // TIMESTAMP
               $value = strtotime($value);
