@@ -193,13 +193,13 @@ class crawler
         $value = trim($value);
         if (array_key_exists($key, CONFIG::ITEM_DATA)) {
           switch ($key) {
-            case 'Submitted by:':
+            case 'Submitter:':
               $value = htmlspecialchars($value);
               break;
             case 'Assigned to:':
               $value = htmlspecialchars($value);
               break;
-            case 'Submitted on:':          // TIMESTAMP
+            case 'Submitted:':             // TIMESTAMP
               $value = strtotime($value);
               break;
             case 'Open/Closed:':           // INTEGER

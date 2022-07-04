@@ -92,7 +92,7 @@ class formatter
       }
       return ($t === 0) ? '< a day' : "$t day(s) ago";
     };
-    $item['SubmittedOn'] = $toDays($item['SubmittedOn']);
+    $item['Submitted']   = $toDays($item['Submitted']);
     $item['LastComment'] = $toDays($item['LastComment']);
     return $item;
   }

@@ -128,9 +128,9 @@ class db
               : function($v){ return "$v"; });
           case 'ItemID':
           case 'Title':
-          case 'SubmittedBy':
+          case 'Submitter':
           //TODO: useful date queries
-          //case 'SubmittedOn':
+          //case 'Submitted':
           //case 'LastComment':
           case 'Category':
           case 'Severity':

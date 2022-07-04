@@ -174,13 +174,13 @@ the following further key-value pairs are possible:
   - `TrackerID={bugs,patch}`
   - `OpenClosed={open,closed}`
   - `Format={HTML|HTMLCSS|JSON|JSONFULL|CSV}`
-  - `OrderBy={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,AttachedFiles,AttachedFileNames,SubmittedBy,OriginatorName}`
+  - `OrderBy={TrackerID,ItemID,Title,Submitted,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,AttachedFiles,AttachedFileNames,Submitter,OriginatorName}`
 
      The sorting order is ascending.
      If the column name has a `!` prefix, the sorting is descending.
-  - `Columns={TrackerID,ItemID,Title,SubmittedOn,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,AttachedFiles,AttachedFileNames,SubmittedBy,OriginatorName,UpdateCallback}`
+  - `Columns={TrackerID,ItemID,Title,Submitted,LastComment,Category,Severity,Priority,ItemGroup,Status,AssignedTo,OpenClosed,Release,OperatingSystem,AttachedFiles,AttachedFileNames,Submitter,OriginatorName,UpdateCallback}`
   - `LastComment=[IGNORED]`
-  - `SubmittedOn=[IGNORED]`
+  - `Submitted=[IGNORED]`
 - `Action=update`
   - `TrackerID={bugs,patch}`
   - `ItemID=[ints]`
