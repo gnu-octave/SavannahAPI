@@ -102,11 +102,13 @@ class crawler
 
       // Watching out for a string like "9027 matching items - Items 1 to 50",
       // where "9027" should be the total number of project bugs.
-      $id_counts = $doc->getElementsByTagName('h2');
-      if ($id_counts->length > 1) {
-        preg_match_all('!\d+!', $id_counts->item(0)->nodeValue, $matches);
+      $id_counts = $doc->getElementById('results');
+      if ($id_counts) {
+        preg_match_all('!\d+!', $id_counts->nodeValue, $matches);
         $offset       = (int) $matches[0][2];  // prepare for next loop
         $num_of_items = (int) $matches[0][0];
+      } else {
+        die("No progress possible!");
       }
 
       // Find IDs on current page
