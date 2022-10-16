@@ -357,6 +357,30 @@ class db
   }
 
 
+  /**
+   * Delete an item with discussion from database.
+   *
+   * @param ItemID ID of an item in a Savannah tracker (bugs, patch).
+   * @param TrackerID ID from `CONFIG::TRACKER`.
+   *
+   * Function does not error is item to delete does not exist.
+   */
+  public function delete($ItemID, $TrackerID)
+  {
+    $dbID = $this->getInteralItemID($ItemID, $TrackerID);
+    if ($dbID > 0) {
+      $command = 'DELETE FROM Items WHERE ID=:dbID';
+      $stmt = $this->pdo->prepare($command);
+      $stmt->execute([
+        ':dbID' => $dbID
+        ]);
+    } else {
+      DEBUG_LOG("db->delete: ItemID '$ItemID' and TrackerID '$tracker'
+                 does not exist in database.");
+    }
+  }
+
+
   private function insertIntoItems($item)
   {
     $columns = array_column(array_values(CONFIG::ITEM_DATA), 0);

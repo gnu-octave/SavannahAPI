@@ -342,6 +342,8 @@ class api
         if (isset($item) && isset($discussion)) {
           $db->update($item, $discussion);
         } else {
+          // Ensure faulty entries to no longer exist.
+          $db->delete($id, $tracker);
           return $this->JSON("error",
                              "Invalid ItemID '$id' for TrackerID '$tracker'.");
         }
