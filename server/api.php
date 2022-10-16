@@ -345,7 +345,7 @@ class api
           $db->update($item, $discussion);
         } else {
           // Ensure faulty entries to no longer exist.
-          $db->delete($id, $tracker);
+          $db->delete($id, array_search($tracker, CONFIG::TRACKER));
           $runtimeWanings .= "Invalid ItemID '$id' for TrackerID '$tracker'. ";
         }
       }

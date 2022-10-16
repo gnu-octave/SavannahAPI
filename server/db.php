@@ -371,7 +371,8 @@ class db
     if ($dbID > 0) {
       DEBUG_LOG("db->delete: ItemID '$ItemID' and TrackerID '$tracker'
                  exists as '$dbID' in database.");
-      $command = 'DELETE FROM Items WHERE ID=:dbID';
+      $command = 'DELETE FROM Items       WHERE     ID=:dbID ;
+                  DELETE FROM Discussions WHERE ItemID=:dbID';
       $stmt = $this->pdo->prepare($command);
       $stmt->execute([
         ':dbID' => $dbID
