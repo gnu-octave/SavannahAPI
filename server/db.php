@@ -369,6 +369,8 @@ class db
   {
     $dbID = $this->getInteralItemID($ItemID, $TrackerID);
     if ($dbID > 0) {
+      DEBUG_LOG("db->delete: ItemID '$ItemID' and TrackerID '$tracker'
+                 exists as '$dbID' in database.");
       $command = 'DELETE FROM Items WHERE ID=:dbID';
       $stmt = $this->pdo->prepare($command);
       $stmt->execute([
