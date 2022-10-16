@@ -275,6 +275,8 @@ class api
               ? $request['TrackerID']
               : CONFIG::TRACKER;
 
+    $runtimeWanings = "";
+
     foreach ($trackers as $tracker) {
       $ids = $requestIDs;
       $trackerID = array_search($tracker, CONFIG::TRACKER);
@@ -344,13 +346,12 @@ class api
         } else {
           // Ensure faulty entries to no longer exist.
           $db->delete($id, $tracker);
-          return $this->JSON("error",
-                             "Invalid ItemID '$id' for TrackerID '$tracker'.");
+          $runtimeWanings .= "Invalid ItemID '$id' for TrackerID '$tracker'. ";
         }
       }
     }
 
-    return $this->JSON("success", "Update successful.");
+    return $this->JSON("success", $runtimeWanings . "Update completed.");
   }
 
 
