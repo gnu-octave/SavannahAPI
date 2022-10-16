@@ -308,7 +308,7 @@ class api
             $lastComment = $db->getMaxLastCommentFromTracker($trackerID);
             $lastComment = strtotime("-1 day", $lastComment);
             $ids = array_merge($ids, $crawler->crawlUpdatedItems($tracker,
-                                                                $lastComment));
+                                                                 $lastComment));
           } else {
             return $this->JSON("info", "'crawlUpdatedItems_$tracker'
                                        delayed for $nextLookup seconds.");
@@ -348,7 +348,7 @@ class api
       }
     }
 
-    return $this->JSON("success",  "Update successful.");
+    return $this->JSON("success", "Update successful.");
   }
 
 

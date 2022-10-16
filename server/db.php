@@ -220,7 +220,8 @@ class db
    *
    * @returns an array of discussions.
    */
-  public function getDiscussion($trackerID, $itemID) {
+  public function getDiscussion($trackerID, $itemID)
+  {
     $data = array();  // return value
 
     $command = 'SELECT ID
