@@ -10,7 +10,7 @@ var defaultQueries = [
    api:   'Action=get&Format=HTMLCSS&OrderBy=!LastComment&Limit=50',
    url:   'https://savannah.gnu.org/bugs/?group=octave'},
   {label: 'Octave 9',
-   api:   'Action=get&Format=HTMLCSS&OpenClosed=open&TrackerID=bugs&Category!=Forge,website&Release=9',
+   api:   'Action=get&Format=HTMLCSS&OpenClosed=open&TrackerID=bugs&Category!=Forge,website&Release=9.',
    url:   'https://savannah.gnu.org/bugs/index.php?go_report=Apply&group=octave&func=browse&set=custom&msort=0&report_id=221&advsrch=1&resolution_id%5B%5D=0&bug_group_id%5B%5D=0&status_id%5B%5D=1&priority%5B%5D=0&severity%5B%5D=0&category_id%5B%5D=110&category_id%5B%5D=101&category_id%5B%5D=102&category_id%5B%5D=117&category_id%5B%5D=104&category_id%5B%5D=105&category_id%5B%5D=106&category_id%5B%5D=107&category_id%5B%5D=103&category_id%5B%5D=114&category_id%5B%5D=112&category_id%5B%5D=109&category_id%5B%5D=116&category_id%5B%5D=111&category_id%5B%5D=118&release_id%5B%5D=190&platform_version_id%5B%5D=0&history_search=0&history_field=0&history_event=modified&history_date_dayfd=27&history_date_monthfd=11&history_date_yearfd=2023&chunksz=100&boxoptionwanted=1#options'},
   {label: 'Severity >= 4',
    api:   'Action=get&Format=HTMLCSS&OpenClosed=open&TrackerID=bugs&Category!=Forge,website&Severity=4,5,6&Status!=Wont',
