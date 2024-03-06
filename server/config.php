@@ -33,7 +33,7 @@ class CONFIG
   /**
    * Configurable constant parameters database.
    */
-  const DB_FILE = 'savannah.cache.sqlite';
+  const DB_FILE = 'data/savannah.cache.sqlite';
 
   /**
    * Common data structures for the database and crawler (interface).
@@ -87,7 +87,7 @@ class CONFIG
 
 if (!function_exists('DEBUG_LOG')) {
   function DEBUG_LOG($str) {
-    /* Uncomment for debugging.
+/* Uncomment for debugging.
     echo("$str<br>");
     ob_flush();
     flush();*/

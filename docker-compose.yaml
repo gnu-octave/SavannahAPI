@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  server-dev:
+    build:
+      context: .
+    command: php firstrun.php
+    working_dir: /var/www/html/server
+    volumes:
+      - type: bind
+        source: .
+        target: /var/www/html
+
+  server-init:
+    build:
+      context: .
+    command: php firstrun.php 2>&1 | tee data/firstrun.log.txt
+    working_dir: /var/www/html/server
+    volumes:
+      - type: volume
+        source: savannah_data
+        target: /var/www/html/server/data
+      - type: bind
+        source: ./doc/FIRSTRUN
+        target: /var/www/html/server/FIRSTRUN
+        read_only: true
+
+  server:
+    build:
+      context: .
+    ports:
+      - target: 80
+        published: 8080
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: volume
+        source: savannah_data
+        target: /var/www/html/server/data
+
+volumes:
+  savannah_data:
