@@ -115,7 +115,7 @@ class crawler
       $newIDs = array();
       $xpath = new DOMXpath($doc);
       foreach ($xpath->query('//table[@class="box"]/tr/td[1]') as $id) {
-        $id = (int) substr($id->nodeValue, 3);
+        $id = (int) substr($id->nodeValue, 1);
         if ($id > $lastID) {
           array_push($newIDs, $id);
         }
