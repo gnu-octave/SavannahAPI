@@ -42,7 +42,7 @@ class crawler
 
       $doc = new DOMDocument;
       $doc->preserveWhiteSpace = false;
-      $doc->loadHTMLFile("$url$Y-$M", LIBXML_NOWARNING);
+      $doc->loadHTMLFile("$url$Y-$M", LIBXML_NOWARNING | LIBXML_NOERROR);
       $xpath = new DOMXpath($doc);
       foreach ($xpath->query('//body/ul/li') as $day) {
         $day  = $day->nodeValue;
@@ -98,7 +98,7 @@ class crawler
       DEBUG_LOG("--> Crawl $num_of_items items, offset=$offset.");
       $doc = new DOMDocument;
       $doc->preserveWhiteSpace = false;
-      $doc->loadHTMLFile("$url&offset=$offset", LIBXML_NOWARNING);
+      $doc->loadHTMLFile("$url&offset=$offset", LIBXML_NOWARNING | LIBXML_NOERROR);
 
       // Watching out for a string like "9027 matching items - Items 1 to 50",
       // where "9027" should be the total number of project bugs.
@@ -157,7 +157,7 @@ class crawler
 
     $doc = new DOMDocument;
     $doc->preserveWhiteSpace = false;
-    $doc->loadHTMLFile(CONFIG::BASE_URL . "/$tracker/index.php?$id", LIBXML_NOWARNING);
+    $doc->loadHTMLFile(CONFIG::BASE_URL . "/$tracker/index.php?$id", LIBXML_NOWARNING | LIBXML_NOERROR);
 
     // Check if bug belongs to the project group.
     $project = $doc->getElementsByTagName('title');
