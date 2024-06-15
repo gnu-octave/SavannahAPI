@@ -26,6 +26,7 @@ services:
         read_only: true
 
   server:
+    restart: always
     build:
       context: .
     ports:
